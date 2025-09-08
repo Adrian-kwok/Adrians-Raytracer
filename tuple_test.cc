@@ -2,5 +2,6 @@
 #include "tuples.h"
 
 int main() {
-    tuple *t = new tpoint(1,2,3);
+    tpoint tp = tpoint(1,2,3);
+    std::cout << tp.x << std::endl;
 }
