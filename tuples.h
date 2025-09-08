@@ -1,6 +1,6 @@
 #ifndef TUPLES
 #define TUPLES
-#include <math.h>
+#include <cmath>
 #include "float_eq.cc"
 
 enum tuple_type {

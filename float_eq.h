@@ -1,6 +1,6 @@
 #ifndef FLOATEQ
 #define FLOATEQ
-#include <math.h>
+#include <cmath>
 
 bool equal(float f1, float f2);
 
