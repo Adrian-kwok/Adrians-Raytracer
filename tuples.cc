@@ -38,12 +38,21 @@ bool operator==(tuple t1, tuple t2) {
 }
 
 float norm(tuple t) {
-    return cbrt(t.x * t.x + t.y * t.y + t.z * t.z);
+    return sqrt(t.x * t.x + t.y * t.y + t.z * t.z);
 }
+
 tuple normalize(tuple t) {
     return t / norm(t);
 }
 
 float dot(tuple t1, tuple t2) {
     return t1.x * t2.x + t1.y * t2.y + t1.z * t2.z;
+}
+
+tuple cross(tuple t1, tuple t2) {
+    return vector(
+        (t1.y * t2.z) - (t1.z * t2.y),
+        (t1.z * t2.x) - (t1.x * t2.z),
+        (t1.x * t2.y) - (t1.y * t1.x)
+    );
 }
