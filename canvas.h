@@ -4,8 +4,11 @@
 #include "tuples.h"
 #include "color.h"
 #include <algorithm>
+#include <fstream>
+#include <string>
 
 const color BLACK {0,0,0};
+const int COLORDEPTH = 255;
 
 class Canvas {
     private:
@@ -18,6 +21,8 @@ class Canvas {
     public:
         // default ctor + big 5
         Canvas(int w, int h);
+        // from ppm file. Will crash if the file doesn't exist or is formatted wrong
+        Canvas(std::string filename);
         ~Canvas();
         
         Canvas(const Canvas& c);
@@ -33,5 +38,8 @@ class Canvas {
         // true: successful write, false: unsuccessful
         bool write_pixel(int x, int y, color c);
 };
+
+// function won't clear the file if it already exists, it must be done seperately
+void canvas_to_ppm(const Canvas& c, const std::string filename);
 
 #endif

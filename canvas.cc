@@ -1,5 +1,19 @@
 #include "canvas.h"
 
+// helper functions
+
+std::string compress_color(float i) {
+    if (i > 1) {
+        return std::to_string(COLORDEPTH);
+    } else if (i < 0) {
+        return std::string("0");
+    } else {
+        return std::to_string(int(i * COLORDEPTH));
+    }
+}
+
+// class functions
+
 Canvas::Canvas(int width, int height)
     : image{nullptr}, x_size{width}, y_size{height} {
   image = new color*[width];
@@ -9,6 +23,35 @@ Canvas::Canvas(int width, int height)
       image[i][j] = BLACK;
     }
   }
+}
+
+Canvas::Canvas(std::string filename): image{nullptr}, x_size{0}, y_size{0} {
+    std::ifstream ifs {filename};
+    std::string tempstr;
+    ifs >> tempstr; // getting rid of P3 header
+    ifs >> x_size;  // getting width
+    ifs >> y_size;  // getting height
+
+    int local_depth;    // getting color depth specified in file
+    ifs >> local_depth;
+
+    // copying in image
+    image = new color*[x_size];
+    for (int i = 0; i < x_size; i++) {
+        image[i] = new color[y_size];
+    }
+
+    for (int i = 0; i < y_size; i++) {
+        for (int j = 0; j < x_size; j++) {
+            ifs >> image[j][i].r;
+            image[j][i].r /= local_depth;
+            ifs >> image[j][i].g;
+            image[j][i].g /= local_depth;
+            ifs >> image[j][i].b;
+            image[j][i].b /= local_depth;
+        }
+    }
+    ifs.close();
 }
 
 Canvas::~Canvas() {
@@ -85,4 +128,28 @@ bool Canvas::write_pixel(int x, int y, color c) {
         image[x][y] = c;
         return true;
     }
+}
+
+void canvas_to_ppm(const Canvas& c, const std::string filename) {
+    std::ofstream ofs {filename};
+    
+    int w = c.width();
+    int h = c.height();
+
+    // header
+    ofs << "P3" << std::endl;
+    ofs << w << " " << h << std::endl;
+    ofs << COLORDEPTH << std::endl;
+
+    //image data
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            ofs << compress_color(c.pixel_at(j,i).r) << " ";
+            ofs << compress_color(c.pixel_at(j,i).g) << " ";
+            ofs << compress_color(c.pixel_at(j,i).b) << " ";
+        }
+        ofs << std::endl;
+    }
+    ofs << std::endl;
+    ofs.close();
 }
