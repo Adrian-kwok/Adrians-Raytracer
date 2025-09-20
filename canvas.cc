@@ -57,7 +57,7 @@ Canvas::Canvas(std::string filename): image{nullptr}, x_size{0}, y_size{0} {
 Canvas::~Canvas() {
   if (image != nullptr) {  // move ctor will set this to nullptr
     for (int i = 0; i < x_size; i++) {
-      delete image[i];
+      delete[] image[i];
     }
     delete[] image;
   }
@@ -80,6 +80,10 @@ Canvas::Canvas(Canvas&& c)
 }
 
 Canvas& Canvas::operator=(const Canvas& c) {
+  if (this == &c) {  // checking for self assignment
+    return *this;
+  }
+
   if (image != nullptr) {
     for (int i = 0; i < c.x_size; i++) {
       delete image[i];
