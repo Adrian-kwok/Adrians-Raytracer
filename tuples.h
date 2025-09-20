@@ -6,6 +6,10 @@
 
 struct tuple {
   float x, y, z, w;
+
+  // these are to make working with for loops easier
+  void set(int i, float val);
+  float get(int i) const;
 };
 
 tuple point(float x, float y, float z);
