@@ -9,7 +9,7 @@
 const int TUPLE_SIZE = 4;
 
 class Matrix {
-  float** data; // this could be a smart pointer, but it's more hassle than it's worth
+  double** data; // this could be a smart pointer, but it's more hassle than it's worth
   int row_dim;
   int col_dim;
 
@@ -26,8 +26,8 @@ class Matrix {
   int num_rows() const;
   int num_cols() const;
 
-  void set(int row_ind, int col_ind, float val);   // if outside of indexes does nothing
-  float get(int row_ind, int col_ind) const;    // if outside of indexes returns 0
+  void set(int row_ind, int col_ind, double val);   // if outside of indexes does nothing
+  double get(int row_ind, int col_ind) const;    // if outside of indexes returns 0
 };
 
 Matrix identity(int dim);
@@ -38,8 +38,14 @@ tuple operator*(const Matrix& m, const tuple& t); // only works with 4x4 matrix 
 
 // submatrix also assumes a square matrix
 Matrix submatrix(const Matrix& m, int row, int col); //  row and col better not be OOB!
-float cofactor(const Matrix& m, int row, int col);
-float det(const Matrix& m);
+double cofactor(const Matrix& m, int row, int col);
+double det(const Matrix& m);
+bool is_invertible(const Matrix& m);
+
+// if m is not invertible, returns default matrix instead
+Matrix inverse(const Matrix& m);
+
+Matrix transpose(const Matrix& m);
 
 const Matrix DEFAULT {1,1};
 const Matrix IDENTITY = identity(TUPLE_SIZE);

@@ -2,9 +2,9 @@
 
 Matrix::Matrix(int row_dim, int col_dim)
     : data{nullptr}, row_dim{row_dim}, col_dim{col_dim} {
-  data = new float*[row_dim];
+  data = new double*[row_dim];
   for (int i = 0; i < row_dim; i++) {
-    data[i] = new float[col_dim];
+    data[i] = new double[col_dim];
     for (int j = 0; j < col_dim; j++) {
       data[i][j] = 0;
     }
@@ -13,11 +13,11 @@ Matrix::Matrix(int row_dim, int col_dim)
 
 Matrix::Matrix(int row_dim, int col_dim, std::string input)
     : data{nullptr}, row_dim{row_dim}, col_dim{col_dim} {
-  data = new float*[row_dim];
+  data = new double*[row_dim];
   std::istringstream iss{input};
 
   for (int i = 0; i < row_dim; i++) {
-    data[i] = new float[col_dim];
+    data[i] = new double[col_dim];
     for (int j = 0; j < col_dim; j++) {
       if (!(iss >> data[i][j])) {
         data[i][j] = 0;
@@ -37,9 +37,9 @@ Matrix::~Matrix() {
 
 Matrix::Matrix(const Matrix& m)
     : data{nullptr}, row_dim{m.row_dim}, col_dim{m.col_dim} {
-  data = new float*[row_dim];
+  data = new double*[row_dim];
   for (int i = 0; i < row_dim; i++) {
-    data[i] = new float[col_dim];
+    data[i] = new double[col_dim];
     for (int j = 0; j < col_dim; j++) {
       data[i][j] = m.data[i][j];
     }
@@ -62,9 +62,9 @@ Matrix& Matrix::operator=(const Matrix& m) {
   row_dim = m.row_dim;
   col_dim = m.col_dim;
 
-  data = new float*[row_dim];
+  data = new double*[row_dim];
   for (int i = 0; i < row_dim; i++) {
-    data[i] = new float[col_dim];
+    data[i] = new double[col_dim];
     for (int j = 0; j < col_dim; j++) {
       data[i][j] = m.data[i][j];
     }
@@ -84,14 +84,14 @@ Matrix& Matrix::operator=(Matrix&& m) {
 int Matrix::num_rows() const { return row_dim; }
 int Matrix::num_cols() const { return col_dim; }
 
-void Matrix::set(int row_ind, int col_ind, float val) {
+void Matrix::set(int row_ind, int col_ind, double val) {
   if (!(row_ind >= row_dim || row_ind < 0 || col_ind >= col_dim ||
         col_ind < 0)) {  // do nothing if out of bounds
     data[row_ind][col_ind] = val;
   }
 }
 
-float Matrix::get(int row_ind, int col_ind) const {
+double Matrix::get(int row_ind, int col_ind) const {
   if (row_ind >= row_dim || row_ind < 0 || col_ind >= col_dim ||
       col_ind < 0) {  // if out of bounds return 0
     return 0;
@@ -125,7 +125,7 @@ Matrix operator*(const Matrix& m1, const Matrix& m2) {
 
   for (int i = 0; i < mat.num_rows(); i++) {
     for (int j = 0; j < mat.num_cols(); j++) {
-      float temp = 0;
+      double temp = 0;
       for (int k = 0; k < m1.num_cols(); k++) {
         temp += m1.get(i, k) * m2.get(k, j);
       }
@@ -141,7 +141,7 @@ tuple operator*(const Matrix& m, const tuple& t) {
 
   // because of the way get works, 0 is returned if index is OOB, as desired
   for (int i = 0; i < TUPLE_SIZE; i++) {
-    float temp = 0;
+    double temp = 0;
     for (int j = 0; j < TUPLE_SIZE; j++) {
       temp += m.get(i, j) * t.get(j);
     }
@@ -184,7 +184,7 @@ Matrix submatrix(const Matrix& m, int row, int col) {
   return mat;
 }
 
-float cofactor(const Matrix& m, int row, int col) {
+double cofactor(const Matrix& m, int row, int col) {
   Matrix submat{submatrix(m, row, col)};
   if ((row + col) % 2 == 0) {
     return det(submat);
@@ -193,7 +193,7 @@ float cofactor(const Matrix& m, int row, int col) {
   }
 }
 
-float det(const Matrix& m) {
+double det(const Matrix& m) {
   if (m.num_rows() != m.num_cols()) {  // check for non-square matricies
     return 0;
   }
@@ -217,7 +217,7 @@ float det(const Matrix& m) {
 
           // swapping to get non-zero value at 0,0
           for (int j = 0; j < temp_mat.num_cols(); j++) { 
-            float temp = temp_mat.get(0, j);
+            double temp = temp_mat.get(0, j);
             temp_mat.set(0, j, temp_mat.get(i, j));
             temp_mat.set(i, j, temp);
           }
@@ -235,7 +235,7 @@ float det(const Matrix& m) {
         continue;
       }
 
-      float factor = temp_mat.get(i, 0) / temp_mat.get(0, 0);
+      double factor = temp_mat.get(i, 0) / temp_mat.get(0, 0);
       for (int j = 0; j < temp_mat.num_cols(); j++) {
         temp_mat.set(i, j, temp_mat.get(i, j) - temp_mat.get(0, j) * factor);
       }
@@ -247,4 +247,39 @@ float det(const Matrix& m) {
       return (temp_mat.get(0,0) * det(submatrix(temp_mat, 0, 0)));
     }
   }
+}
+
+Matrix transpose(const Matrix& m) {
+  Matrix t {m.num_cols(), m.num_rows()};
+
+  for (int i = 0; i < m.num_cols(); i++) {
+    for (int j = 0; j < m.num_rows(); j++) {
+      t.set(i, j, m.get(j, i));
+    }
+  }
+  
+  return t;
+}
+
+// this function is dumb
+bool is_invertible(const Matrix& m) {
+  return (det(m) != 0);
+}
+
+Matrix inverse(const Matrix& m) {
+  double determinant = det(m);
+  if (determinant == 0) {
+    std::cerr << "Error: trying to invert non-invertible matrix" << std::endl;
+    return DEFAULT;
+  }
+  
+  Matrix inv {m.num_rows(), m.num_cols()};
+
+  for (int i = 0; i < inv.num_rows(); i++) {
+    for (int j = 0; j < inv.num_cols(); j++) {
+      inv.set(i,j, cofactor(m,i,j) / determinant);
+    }
+  }
+
+  return transpose(inv);
 }
