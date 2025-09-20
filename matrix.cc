@@ -104,7 +104,7 @@ bool operator==(const Matrix& m1, const Matrix& m2) {
   if (m1.num_rows() == m2.num_rows() && m1.num_cols() == m2.num_cols()) {
     for (int i = 0; i < m1.num_rows(); i++) {
       for (int j = 0; j < m1.num_cols(); j++) {
-        if (m1.get(i, j) != m2.get(i, j)) {
+        if (!equal(m1.get(i, j), m2.get(i, j))) {
           return false;  // if one doesn't match return false
         }
       }
