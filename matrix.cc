@@ -14,7 +14,7 @@ Matrix::Matrix(int row_dim, int col_dim)
 Matrix::Matrix(int row_dim, int col_dim, std::string input)
     : data{nullptr}, row_dim{row_dim}, col_dim{col_dim} {
   data = new float*[row_dim];
-  std::istringstream iss {input};
+  std::istringstream iss{input};
 
   for (int i = 0; i < row_dim; i++) {
     data[i] = new float[col_dim];
@@ -204,10 +204,47 @@ float det(const Matrix& m) {
   } else if (m.num_rows() == 2) {
     return m.get(0, 0) * m.get(1, 1) - m.get(1, 0) * m.get(0, 1);
   } else {
-    float result = 0;
-    for (int i = 0; i < m.num_cols(); i++) {
-      result += m.get(0, i) * cofactor(m, 0, i);
+    // performing gaussian elimination
+    Matrix temp_mat{m};
+
+    bool swap = false;
+
+    // first finding a non-zero element in the first spot of the matrix
+    if (temp_mat.get(0, 0) == 0) {
+      for (int i = 0; i < temp_mat.num_rows(); i++) {
+        if (temp_mat.get(i, 0) != 0) {
+          swap = true;
+
+          // swapping to get non-zero value at 0,0
+          for (int j = 0; j < temp_mat.num_cols(); j++) { 
+            float temp = temp_mat.get(0, j);
+            temp_mat.set(0, j, temp_mat.get(i, j));
+            temp_mat.set(i, j, temp);
+          }
+        }
+      }
+
+      if (!swap) {  // in this case the entire first col is 0 => det is 0
+        return 0;
+      }
     }
-    return result;
+
+    // now can assume number at 0,0 is non-zero
+    for (int i = 1; i < temp_mat.num_rows(); i++) {
+      if (temp_mat.get(i, 0) == 0) {  // trivial case for gausian elimination
+        continue;
+      }
+
+      float factor = temp_mat.get(i, 0) / temp_mat.get(0, 0);
+      for (int j = 0; j < temp_mat.num_cols(); j++) {
+        temp_mat.set(i, j, temp_mat.get(i, j) - temp_mat.get(0, j) * factor);
+      }
+    }
+
+    if (swap) {
+      return -(temp_mat.get(0,0) * det(submatrix(temp_mat, 0, 0)));
+    } else {
+      return (temp_mat.get(0,0) * det(submatrix(temp_mat, 0, 0)));
+    }
   }
 }
