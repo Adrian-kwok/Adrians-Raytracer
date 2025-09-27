@@ -15,5 +15,6 @@ Matrix roto_x(double rads);
 Matrix roto_y(double rads);
 Matrix roto_z(double rads);
 
+Matrix shear(double xpy, double xpz, double ypx, double ypz, double zpx, double zpy);
 
 #endif

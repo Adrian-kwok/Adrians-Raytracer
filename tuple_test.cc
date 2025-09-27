@@ -2,9 +2,9 @@
 
 #include "canvas.h"
 #include "matrix.h"
+#include "matrix_transform.h"
 #include "tuples.h"
 #include "utility"
-#include "matrix_transform.h"
 
 void display(Canvas& c) {
   int w, h;
@@ -44,6 +44,11 @@ void p_point(const tuple& t) {
     std::cout << t.get(i);
   }
   std::cout << ")" << std::endl;
+}
+
+void c_tuple(const tuple& t, Canvas& c) {
+  c.write_pixel(round((c.width() / 2) - t.x), round((c.height() / 2) - t.z),
+                color{1, 1, 1});
 }
 
 int main() {
@@ -124,7 +129,7 @@ int main() {
   tuple p1 = point(-3, 4, 5);
   p_point(matt1 * p1);
   p_point(inverse(matt1) * p1);
-  p_point(matt1 * vector(1,1,1));
+  p_point(matt1 * vector(1, 1, 1));
 
   Matrix matt2 = scale(2, 3, 4);
   tuple p2 = point(-4, 6, 8);
@@ -140,4 +145,29 @@ int main() {
   p_point(mattx * p3);
   p_point(matty * p3);
   p_point(mattz * p3);
+
+  Matrix matshear = shear(1, 2, 3, 4, 5, 6);
+  p_point(matshear * point(1, -2, 3));
+
+  Canvas clock{50, 50};
+
+  Matrix clock_rot = roto_y(PI / 6);
+  tuple hand = point(0, 0, 20);
+  for (int j = 0; j < 6; j++) {
+    for (int i = 0; i < 12; i++) {
+      c_tuple(shear(0,1,0,0,0,0) * scale(0.7, 0.7, 0.7) * hand, clock);
+      hand = clock_rot * hand;
+    }
+    hand = scale(0.8, 0.8, 0.8) * hand;
+    hand = roto_y(PI / 36) * hand;
+  }
+
+  tuple edge = point(0, 0, 23);
+  Matrix edge_rot = roto_y(PI / 180);
+  for (int i = 0; i < 360; i++) {
+    c_tuple(shear(0,1,0,0,0,0) * (scale(0.7, 0.7, 0.7) * edge), clock);
+    edge = edge_rot * edge;
+  }
+
+  canvas_to_ppm(clock, "./img/clock.ppm");
 }

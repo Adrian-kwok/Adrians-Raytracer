@@ -59,4 +59,16 @@ Matrix roto_z(double rads) {
   return mat;
 }
 
+Matrix shear(double xpy, double xpz, double ypx, double ypz, double zpx,
+             double zpy) {
+  Matrix mat = identity(TUPLE_SIZE);
 
+  mat.set(0, 1, xpy);
+  mat.set(0, 2, xpz);
+  mat.set(1, 0, ypx);
+  mat.set(1, 2, ypz);
+  mat.set(2, 0, zpx);
+  mat.set(2, 1, zpy);
+
+  return mat;
+}
