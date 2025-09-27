@@ -2,32 +2,32 @@
 #define TUPLES
 #include <cmath>
 
-#include "float_eq.h"
+#include "double_eq.h"
 
 struct tuple {
-  float x, y, z, w;
+  double x, y, z, w;
 
   // these are to make working with for loops easier
-  void set(int i, float val);
-  float get(int i) const;
+  void set(int i, double val);
+  double get(int i) const;
 };
 
-tuple point(float x, float y, float z);
-tuple vector(float x, float y, float z);
+tuple point(double x, double y, double z);
+tuple vector(double x, double y, double z);
 
 tuple operator+(tuple t1, tuple t2);
 tuple operator-(tuple t1, tuple t2);
 tuple operator-(tuple t);
-tuple operator*(tuple t, float scalar);
+tuple operator*(tuple t, double scalar);
 // scalar cannot be 0, else 0 vector is returned
-tuple operator/(tuple t, float scalar);
+tuple operator/(tuple t, double scalar);
 
 bool operator==(tuple t1, tuple t2);
 
-float norm(tuple t);
+double norm(tuple t);
 tuple normalize(tuple t);
 
-float dot(tuple t1, tuple t2);
+double dot(tuple t1, tuple t2);
 // always returns a vector
 tuple cross(tuple t1, tuple t2);
 

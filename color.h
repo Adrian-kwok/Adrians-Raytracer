@@ -1,7 +1,7 @@
 #ifndef COLOR
 #define COLOR
 
-#include "float_eq.h"
+#include "double_eq.h"
 #include <cmath>
 
 struct color {

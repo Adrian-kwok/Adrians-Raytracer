@@ -1,10 +1,10 @@
 #include "tuples.h"
 
-tuple point(float x, float y, float z) { return tuple{x, y, z, 1}; }
+tuple point(double x, double y, double z) { return tuple{x, y, z, 1}; }
 
-tuple vector(float x, float y, float z) { return tuple{x, y, z, 0}; }
+tuple vector(double x, double y, double z) { return tuple{x, y, z, 0}; }
 
-void tuple::set(int ind, float val) {
+void tuple::set(int ind, double val) {
   if (ind == 0) {
     x = val;
   } else if (ind == 1) {
@@ -16,7 +16,7 @@ void tuple::set(int ind, float val) {
   }
 }
 
-float tuple::get(int ind) const{
+double tuple::get(int ind) const{
   if (ind == 0) {
     return x;
   } else if (ind == 1) {
@@ -38,12 +38,12 @@ tuple operator-(tuple t1, tuple t2) {
 }
 tuple operator-(tuple t) { return tuple{-t.x, -t.y, -t.z, -t.w}; }
 
-tuple operator*(tuple t, float scalar) {
+tuple operator*(tuple t, double scalar) {
   return tuple{t.x * scalar, t.y * scalar, t.z * scalar, t.w * scalar};
 }
 
 // scalar cannot be 0, else 0 vector is returned
-tuple operator/(tuple t, float scalar) {
+tuple operator/(tuple t, double scalar) {
   if (scalar == 0) {
     return ZEROVEC;
   } else {
@@ -56,13 +56,13 @@ bool operator==(tuple t1, tuple t2) {
           equal(t1.w, t2.w));
 }
 
-float norm(tuple t) {
+double norm(tuple t) {
   return sqrt(t.x * t.x + t.y * t.y + t.z * t.z + t.w * t.w);
 }
 
 tuple normalize(tuple t) { return t / norm(t); }
 
-float dot(tuple t1, tuple t2) {
+double dot(tuple t1, tuple t2) {
   return t1.x * t2.x + t1.y * t2.y + t1.z * t2.z + t1.w * t2.w;
 }
 
