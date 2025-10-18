@@ -31,6 +31,7 @@ double dot(tuple t1, tuple t2);
 // always returns a vector
 tuple cross(tuple t1, tuple t2);
 
-const tuple ZEROVEC {0, 0, 0, 0};
+const tuple ZEROVEC{0, 0, 0, 0};
+const tuple ORIGIN{0, 0, 0, 1};
 
 #endif

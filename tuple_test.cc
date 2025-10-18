@@ -3,8 +3,9 @@
 #include "canvas.h"
 #include "matrix.h"
 #include "matrix_transform.h"
+#include "object.h"
+#include "ray.h"
 #include "tuples.h"
-#include "utility"
 
 void display(Canvas& c) {
   int w, h;
@@ -13,7 +14,7 @@ void display(Canvas& c) {
   for (int i = 0; i < h; i++) {
     for (int j = 0; j < w; j++) {
       if (c.pixel_at(j, i).r != 0) {
-        std::cout << "*";
+        std::cout << "█";
       } else {
         std::cout << " ";
       }
@@ -52,7 +53,7 @@ void c_tuple(const tuple& t, Canvas& c) {
 }
 
 int main() {
-  Canvas c{180, 180};
+  // Canvas c{180, 180};
 
   /*
   for (float i = 0; i < 1; i += 0.002) {
@@ -125,6 +126,7 @@ int main() {
     }
       */
 
+  /*
   Matrix matt1 = translate(5, -3, 2);
   tuple p1 = point(-3, 4, 5);
   p_point(matt1 * p1);
@@ -170,4 +172,102 @@ int main() {
   }
 
   canvas_to_ppm(clock, "./img/clock.ppm");
+  */
+  /*
+  ray r{point(0, 0, -5), vector(0, 0, 1)};
+
+  sphere s1{};
+  sphere s2{1, point(1, 0, 0)};
+
+  std::vector<intersection> intersect1 = s1.intersects(r);
+  for (auto it : intersect1) {
+    p_point(r.position(it.t));
+  }
+
+  std::vector<intersection> intersect2 = s2.intersects(r);
+  for (auto it : intersect2) {
+    p_point(r.position(it.t));
+  }
+
+  sphere s3{1, point(2, 2, 1)};
+  std::vector<intersection> intersect3 = s3.intersects(r);
+  for (auto it : intersect3) {
+    p_point(r.position(it.t));
+  }
+
+  std::vector<intersection> hits;
+  hits.emplace_back(intersection{1, &s1});
+  hits.emplace_back(intersection{2, &s1});
+  std::cout << hit(hits).t << std::endl;
+  hits.clear();
+
+  hits.emplace_back(intersection{1, &s1});
+  hits.emplace_back(intersection{-1, &s1});
+  std::cout << hit(hits).t << std::endl;
+  hits.clear();
+
+  hits.emplace_back(intersection{-2, &s1});
+  hits.emplace_back(intersection{-1, &s1});
+  std::cout << (hit(hits).o == NOINT.o) << std::endl;
+  hits.clear();
+
+  hits.emplace_back(intersection{5, &s1});
+  hits.emplace_back(intersection{7, &s1});
+  hits.emplace_back(intersection{-3, &s1});
+  hits.emplace_back(intersection{2, &s1});
+  std::cout << hit(hits).t << std::endl;
+  hits.clear();
+  */
+
+  /*
+  ray r{point(1, 2, 3), vector(0, 1, 0)};
+  ray r2 = r.transform(translate(3,4,5));
+  p_point(r2.origin);
+  p_point(r2.direction);
+
+  ray r3 = r.transform(scale(2, 3, 4));
+  p_point(r3.origin);
+  p_point(r3.direction);
+
+  ray r4{point(0, 0, -5), vector(0, 0, 1)};
+  sphere s;
+  s.set_transform(scale(2,2,2));
+  std::vector<intersection> hits = s.intersects(r4);
+  std::cout << hits.size() << std::endl;
+  std::cout << hits[0].t << std::endl;
+  std::cout << hits[1].t << std::endl;
+
+  s.clear_transform();
+  s.set_transform(translate(5, 0, 0));
+  std::vector<intersection> spits = s.intersects(r4);
+  std::cout << spits.size() << std::endl;
+  */
+  // display(clock);
+
+  sphere s;
+  sphere s2{2, point(0, 2, 3)};
+  Canvas c{100, 100};
+
+  for (double i = 0; i < 100; i++) {
+    for (double j = 0; j < 100; j++) {
+      ray r{point(j * -0.04 + 2.00, i * -0.04 + 2.00, -5), vector(0, 0, 1)};
+      std::vector<intersection> hits = s.intersects(r);
+      std::vector<intersection> temp = s2.intersects(r);
+      hits.insert(hits.end(), temp.begin(), temp.end());
+      if (hits.size() > 0) {
+        if (hit(hits).o == &s) {
+          std::cout << "█";
+          c.write_pixel(j, i, color{1, 1, 1});
+        } else {
+          std::cout << "#";
+          c.write_pixel(j, i, color{0, 0, 1});
+        }
+      } else {
+        std::cout << " ";
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  canvas_to_ppm(c, "img/sphere.ppm");
 }
