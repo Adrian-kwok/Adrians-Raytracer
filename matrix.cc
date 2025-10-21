@@ -52,6 +52,8 @@ Matrix::Matrix(Matrix&& m)
 }
 
 Matrix& Matrix::operator=(const Matrix& m) {
+  if (&m == this) return *this;
+
   if (data != nullptr) {
     for (int i = 0; i < row_dim; i++) {
       delete[] data[i];
