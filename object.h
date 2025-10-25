@@ -5,9 +5,8 @@
 #include "ray.h"
 
 struct sphere : public obj {
-    double radius;
     std::vector<intersection> intersects(const ray& r) const override;
-    sphere(double r = 1, tuple loc = ORIGIN);
+    tuple normal_at(tuple p) const override;
 };
 
 

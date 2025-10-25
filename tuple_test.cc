@@ -245,12 +245,14 @@ int main() {
   // display(clock);
 
   sphere s;
-  sphere s2{2, point(0, 2, 3)};
+  sphere s2;
+  s2.set_world_transform(translate(-1,0,0));
+  s2.add_obj_transform(scale(1,2,1)); 
   Canvas c{100, 100};
 
   for (double i = 0; i < 100; i++) {
     for (double j = 0; j < 100; j++) {
-      ray r{point(j * -0.04 + 2.00, i * -0.04 + 2.00, -5), vector(0, 0, 1)};
+      ray r{point(j * -0.04 + 2.00, i * -0.04 + 2.00, -10), vector(0, 0, 1)};
       std::vector<intersection> hits = s.intersects(r);
       std::vector<intersection> temp = s2.intersects(r);
       hits.insert(hits.end(), temp.begin(), temp.end());
