@@ -245,31 +245,39 @@ int main() {
   // display(clock);
 
   sphere s;
+  s.add_obj_transform(scale(1.5, 1.5, 1.5));
   sphere s2;
-  s2.set_world_transform(translate(-1,0,0));
-  s2.add_obj_transform(scale(1,2,1)); 
-  Canvas c{100, 100};
-
-  for (double i = 0; i < 100; i++) {
-    for (double j = 0; j < 100; j++) {
-      ray r{point(j * -0.04 + 2.00, i * -0.04 + 2.00, -10), vector(0, 0, 1)};
-      std::vector<intersection> hits = s.intersects(r);
-      std::vector<intersection> temp = s2.intersects(r);
-      hits.insert(hits.end(), temp.begin(), temp.end());
-      if (hits.size() > 0) {
-        if (hit(hits).o == &s) {
-          std::cout << "█";
-          c.write_pixel(j, i, color{1, 1, 1});
+  s2.add_world_transform(translate(0, 0, -2));
+  s2.add_obj_transform(scale(0.25, 1.5, 1));
+  s2.add_obj_transform(roto_z(PI / 4));
+  Matrix rot = identity(4);
+  const Matrix rot_const = roto_y(PI / 180);
+  for (double k = 0; k < 360; k++) {
+     Canvas c{100, 100};
+    for (double i = 0; i < 100; i++) {
+      for (double j = 0; j < 100; j++) {
+        ray r{point(j * -0.08 + 4.00,i * -0.08 + 4.00, -10), vector(0, 0, 1)};
+        r.origin = rot * r.origin;
+        r.direction = rot * r.direction; 
+        std::vector<intersection> hits = s.intersects(r);
+        std::vector<intersection> temp = s2.intersects(r);
+        hits.insert(hits.end(), temp.begin(), temp.end());
+        if (hits.size() > 0) {
+          if (hit(hits).o == &s) {
+            //std::cout << "█";
+            c.write_pixel(j, i, color{1, 1, 1});
+          } else {
+            //std::cout << "#";
+            c.write_pixel(j, i, color{0, 0, 1});
+          }
         } else {
-          std::cout << "#";
-          c.write_pixel(j, i, color{0, 0, 1});
+          //std::cout << " ";
         }
-      } else {
-        std::cout << " ";
       }
+      //std::cout << std::endl;
     }
-    std::cout << std::endl;
+    
+    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int (k + 20)) + std::string(".ppm"));
+    rot = rot * rot_const;
   }
-
-  canvas_to_ppm(c, "img/sphere.ppm");
 }

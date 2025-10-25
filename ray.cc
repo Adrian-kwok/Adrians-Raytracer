@@ -23,8 +23,8 @@ void obj::set_obj_transform(const Matrix& m) {
 }
 
 void obj::add_obj_transform(const Matrix& m) {
-  obj_transform = m * world_transform;
-  obj_inverse = inverse(world_transform);
+  obj_transform = m * obj_transform;
+  obj_inverse = inverse(obj_transform);
 }
 
 
