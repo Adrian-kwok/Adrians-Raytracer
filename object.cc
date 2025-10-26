@@ -33,8 +33,8 @@ tuple sphere::normal_at(tuple p) const {
   if (p.w != 1) std::cerr << "not a point, error" << std::endl;
   p = apply_transform(p);
 
-  tuple object_norm = normalize(p - ORIGIN);  // object space normal
-  //object_norm = transpose(inverse(transform)) * object_norm;
+  tuple object_norm = p - ORIGIN;  // object space normal
+  object_norm = transpose(get_world_inverse() * get_obj_inverse()) * object_norm;
   object_norm.w = 0;
 
   return normalize(object_norm);  // back to world space

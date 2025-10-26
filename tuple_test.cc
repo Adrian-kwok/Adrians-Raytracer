@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "light.h"
 #include "canvas.h"
 #include "matrix.h"
 #include "matrix_transform.h"
@@ -44,6 +45,14 @@ void p_point(const tuple& t) {
     if (i) std::cout << ", ";
     std::cout << t.get(i);
   }
+  std::cout << ")" << std::endl;
+}
+
+void p_color(const color& c) {
+  std::cout << "(";
+  std::cout << c.r << ", ";
+  std::cout << c.g << ", ";
+  std::cout << c.b;
   std::cout << ")" << std::endl;
 }
 
@@ -245,30 +254,36 @@ int main() {
   // display(clock);
 
   sphere s;
+  s.mat = material{color{0.2,.7,0}, 0.1, 0.9, 0.9, 200};
   s.add_obj_transform(scale(1.5, 1.5, 1.5));
   sphere s2;
+  s2.mat = material{color{0.4,0.1,1}, 0.1, 0.9, 0.9, 200};
   s2.add_world_transform(translate(0, 0, -2));
   s2.add_obj_transform(scale(0.25, 1.5, 1));
   s2.add_obj_transform(roto_z(PI / 4));
+
+  point_light l{color{1.5,1.5,1.5}};
+  l.set_world_transform(translate(4,5,0));
+
   Matrix rot = identity(4);
   const Matrix rot_const = roto_y(PI / 180);
   for (double k = 0; k < 360; k++) {
-     Canvas c{100, 100};
-    for (double i = 0; i < 100; i++) {
-      for (double j = 0; j < 100; j++) {
-        ray r{point(j * -0.08 + 4.00,i * -0.08 + 4.00, -10), vector(0, 0, 1)};
+     Canvas c{200, 200};
+    for (double i = 0; i < 200; i++) {
+      for (double j = 0; j < 200; j++) {
+        ray r{point(j * -0.04 + 4.00,i * -0.04 + 4.00, -10), vector(0, 0, 1)};
         r.origin = rot * r.origin;
-        r.direction = rot * r.direction; 
+        r.direction = normalize(rot * r.direction); 
         std::vector<intersection> hits = s.intersects(r);
         std::vector<intersection> temp = s2.intersects(r);
         hits.insert(hits.end(), temp.begin(), temp.end());
         if (hits.size() > 0) {
           if (hit(hits).o == &s) {
             //std::cout << "█";
-            c.write_pixel(j, i, color{1, 1, 1});
+            c.write_pixel(j, i, lighting(s.mat, l, r.position(hit(hits).t), r.direction, s.normal_at(r.position(hit(hits).t))));
           } else {
             //std::cout << "#";
-            c.write_pixel(j, i, color{0, 0, 1});
+            c.write_pixel(j, i, lighting(s2.mat, l, r.position(hit(hits).t), r.direction, s2.normal_at(r.position(hit(hits).t))));
           }
         } else {
           //std::cout << " ";
@@ -280,4 +295,37 @@ int main() {
     canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int (k + 20)) + std::string(".ppm"));
     rot = rot * rot_const;
   }
+
+
+  /*
+  material m;
+  tuple position = ORIGIN;
+
+  //test 1
+  tuple eyev = vector(0,0,-1);
+  tuple normalv = vector(0,0, -1);
+  point_light light{color{1,1,1}};
+  light.set_world_transform(translate(0,0,-10));
+  p_color(lighting(m,light,position,eyev,normalv));
+
+  //test2
+  eyev = vector(0, sqrt(2)/2, -sqrt(2)/2);
+   p_color(lighting(m,light,position,eyev,normalv));
+
+  //test 3
+  eyev = vector(0,0,-1);
+  light.set_world_transform(translate(0,10,-10));
+  p_color(lighting(m,light,position,eyev,normalv));
+
+  //test 4
+  eyev = vector(0,-sqrt(2)/2, -sqrt(2)/2);
+  p_color(lighting(m,light,position,eyev,normalv));
+
+  //test 5
+  eyev = vector(0,0,-1);
+  light.set_world_transform(translate(0,0,10));
+  p_color(lighting(m,light,position,eyev,normalv));
+
+  */
+
 }

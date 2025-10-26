@@ -13,6 +13,8 @@ color operator-(color c1, color c2);
 color operator-(color c);
 color operator*(color c, float scalar);
 
+const color BLACK = color{0,0,0};
+
 // mix colors
 color operator*(color c1, color c2);
 

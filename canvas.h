@@ -6,8 +6,6 @@
 #include <string>
 
 #include "color.h"
-
-const color BLACK{0, 0, 0};
 const int COLORDEPTH = 255;
 
 class Canvas {

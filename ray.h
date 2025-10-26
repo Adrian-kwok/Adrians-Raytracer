@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "color.h"
 #include "matrix_transform.h"
 #include "tuples.h"
 
@@ -13,6 +14,7 @@ struct ray {
   tuple direction = vector(1, 0, 0);  // should be a vector!
 
   tuple position(double t) const;
+  tuple reflect(const tuple& normal) const;
   // applies matrix transformation to ray
   ray transform(const Matrix& m) const;
 };
@@ -27,7 +29,6 @@ class obj {
   Matrix obj_inverse = identity(4);
 
  public:
-
   // sets to a specific matrix
   void set_world_transform(const Matrix& m);
   // applies transformation to existing matrix
@@ -49,7 +50,19 @@ class obj {
 
   ray apply_transform(const ray& r) const;
   tuple apply_transform(const tuple& t) const;
+};
 
+// this is temporary and should be replaced with an abc
+// for which different types of lights derive themselves from
+struct point_light : public obj {
+  color intensity;
+
+  point_light(color c);
+};
+
+// object to be rendered
+class render_obj : public obj {
+ public:
   // assumed to be a point on the surface of the object
   virtual tuple normal_at(tuple p) const = 0;
 
@@ -61,6 +74,15 @@ struct intersection {
   const obj* o;
 };
 
+// used with render objects
+struct material {
+  color c = color{1, 1, 1};
+  float ambient = 0.1;
+  float diffuse = 0.9;
+  float specular = 0.9;
+  float shininess = 200.0;
+};
+
 // vector from object to ray
 tuple obj_to_ray(const obj& o, const ray& r);
 
@@ -70,5 +92,11 @@ const intersection NOINT{0, nullptr};
 // smallest non-negative time value that is returns the intersection which would
 // be when the object "blocks" the ray
 intersection hit(const std::vector<intersection>& hits);
+
+// lighting function, should eventually be changed from point
+// light to just a general light abstract base class
+// position is a point, eye and normal are vectors
+color lighting(const material& m, const point_light& l, const tuple& position,
+               const tuple& eye, const tuple& normal);
 
 #endif

@@ -31,6 +31,9 @@ double dot(tuple t1, tuple t2);
 // always returns a vector
 tuple cross(tuple t1, tuple t2);
 
+// both should be vectors
+tuple reflect(tuple v, tuple norm);
+
 const tuple ZEROVEC{0, 0, 0, 0};
 const tuple ORIGIN{0, 0, 0, 1};
 
