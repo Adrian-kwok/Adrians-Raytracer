@@ -5,7 +5,6 @@
 
 #include "color.h"
 #include "matrix_transform.h"
-#include "tuples.h"
 
 struct intersection;
 

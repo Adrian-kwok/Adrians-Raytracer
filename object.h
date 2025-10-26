@@ -2,7 +2,6 @@
 #define OBJ
 
 #include "ray.h"
-#include "tuples.h"
 
 struct sphere : public render_obj {
   material mat;

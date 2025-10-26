@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "light.h"
 #include "canvas.h"
+#include "light.h"
 #include "matrix.h"
 #include "matrix_transform.h"
 #include "object.h"
@@ -254,48 +254,58 @@ int main() {
   // display(clock);
 
   sphere s;
-  s.mat = material{color{0.2,.7,0}, 0.1, 0.9, 0.9, 200};
+  s.mat = material{color{1, 0.2, 1}, 0.1, 0.9, 0.9, 200};
   s.add_obj_transform(scale(1.5, 1.5, 1.5));
   sphere s2;
-  s2.mat = material{color{0.4,0.1,1}, 0.1, 0.9, 0.9, 200};
+  s2.mat = material{color{0.4, 0.4, 0.4}, 0.1, 0.9, 0.9, 200};
   s2.add_world_transform(translate(0, 0, -2));
   s2.add_obj_transform(scale(0.25, 1.5, 1));
-  s2.add_obj_transform(roto_z(PI / 4));
+  s2.add_obj_transform(roto_z((PI * 3) / 4));
 
-  point_light l{color{1.5,1.5,1.5}};
-  l.set_world_transform(translate(4,5,0));
+  point_light l{color{1.5, 1.5, 1.5}};
+  l.set_world_transform(translate(5, 5, 0));
 
   Matrix rot = identity(4);
   const Matrix rot_const = roto_y(PI / 180);
-  for (double k = 0; k < 360; k++) {
-     Canvas c{200, 200};
+
+  // stacking rotations
+  for (int i = 0; i < 315; i++) {rot = rot_const * rot;}
+
+  for (double k = 0; k < 20; k++) {
+    Canvas c{200, 200};
     for (double i = 0; i < 200; i++) {
       for (double j = 0; j < 200; j++) {
-        ray r{point(j * -0.04 + 4.00,i * -0.04 + 4.00, -10), vector(0, 0, 1)};
+        ray r{point(j * -0.04 + 4.00, i * -0.04 + 4.00, -10), vector(0, 0, 1)};
         r.origin = rot * r.origin;
-        r.direction = normalize(rot * r.direction); 
+        r.direction = normalize(rot * r.direction);
         std::vector<intersection> hits = s.intersects(r);
         std::vector<intersection> temp = s2.intersects(r);
         hits.insert(hits.end(), temp.begin(), temp.end());
         if (hits.size() > 0) {
           if (hit(hits).o == &s) {
-            //std::cout << "█";
-            c.write_pixel(j, i, lighting(s.mat, l, r.position(hit(hits).t), r.direction, s.normal_at(r.position(hit(hits).t))));
+            // std::cout << "█";
+            c.write_pixel(
+                j, i,
+                lighting(s.mat, l, r.position(hit(hits).t), r.direction,
+                         s.normal_at(r.position(hit(hits).t))));
           } else {
-            //std::cout << "#";
-            c.write_pixel(j, i, lighting(s2.mat, l, r.position(hit(hits).t), r.direction, s2.normal_at(r.position(hit(hits).t))));
+            // std::cout << "#";
+            c.write_pixel(
+                j, i,
+                lighting(s2.mat, l, r.position(hit(hits).t), r.direction,
+                         s2.normal_at(r.position(hit(hits).t))));
           }
         } else {
-          //std::cout << " ";
+          // std::cout << " ";
         }
       }
-      //std::cout << std::endl;
+      // std::cout << std::endl;
     }
-    
-    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int (k + 20)) + std::string(".ppm"));
+
+    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int(k + 20)) +
+                         std::string(".ppm"));
     rot = rot * rot_const;
   }
-
 
   /*
   material m;
@@ -327,5 +337,4 @@ int main() {
   p_color(lighting(m,light,position,eyev,normalv));
 
   */
-
 }
