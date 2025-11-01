@@ -18,7 +18,7 @@ void obj::clear_world_transform() {
 }
 
 void obj::set_obj_transform(const Matrix& m) {
-  obj_transform = m * obj_transform;
+  obj_transform = m;
   obj_inverse = inverse(obj_transform);
 }
 
@@ -76,16 +76,16 @@ ray ray::transform(const Matrix& m) const {
   return ray{m * origin, m * direction};
 }
 
-color lighting(const material& m, const point_light& l, const tuple& position,
+color lighting(const material& m, const light& l, const tuple& position,
                const tuple& eye, const tuple& normal) {
   color ambient;
   color diffuse = BLACK;   // default
   color specular = BLACK;  // ""
 
   // combine the surface color with the light's color
-  color effective = m.c * l.intensity;
+  color effective = m.c * l.intensity();
   // direction to light source
-  tuple lightvec = normalize(l.location() - position);
+  tuple lightvec = l.light_vec(position);
   ambient = effective * m.ambient;
 
   // cosine of angle between light and normal, if negative then light is on the
@@ -95,16 +95,14 @@ color lighting(const material& m, const point_light& l, const tuple& position,
     diffuse = effective * m.diffuse * light_dot_normal;
 
     // how close is the eye vector to ideal reflection?
-    double reflect_dot_eye = dot(reflect(-lightvec, normal), eye);
+    double reflect_dot_eye = dot(reflect(lightvec, normal), eye);
     if (reflect_dot_eye > 0) {
       // compute specular contribution
-      specular = l.intensity * m.specular *
+      specular = l.intensity() * m.specular *
                  pow(reflect_dot_eye, m.shininess);
     }
   }
 
+  //return ambient + diffuse + specular;
   return ambient + diffuse + specular;
 }
-
-// to be deleted eventually
-point_light::point_light(color c = color{1,1,1}): intensity{c} {}

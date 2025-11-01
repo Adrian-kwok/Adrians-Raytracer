@@ -254,30 +254,29 @@ int main() {
   // display(clock);
 
   sphere s;
-  s.mat = material{color{1, 0.2, 1}, 0.1, 0.9, 0.9, 200};
+  s.mat = material{color{0, 0.4, 1}, 0.1, 0.9, 0.9, 200};
   s.add_obj_transform(scale(1.5, 1.5, 1.5));
   sphere s2;
-  s2.mat = material{color{0.4, 0.4, 0.4}, 0.1, 0.9, 0.9, 200};
-  s2.add_world_transform(translate(0, 0, -2));
+  s2.mat = material{color{0.9, 0.6, 0}, 0.1, 0.9, 0.9, 200};
+  s2.add_world_transform(translate(0, 0, -3));
   s2.add_obj_transform(scale(0.25, 1.5, 1));
-  s2.add_obj_transform(roto_z((PI * 3) / 4));
 
   point_light l{color{1.5, 1.5, 1.5}};
   l.set_world_transform(translate(5, 5, 0));
 
   Matrix rot = identity(4);
-  const Matrix rot_const = roto_y(PI / 180);
+  const Matrix rot_const = roto_y(PI / 2);
 
   // stacking rotations
-  for (int i = 0; i < 315; i++) {rot = rot_const * rot;}
+  //for (int i = 0; i < 315; i++) {rot = rot_const * rot;}
 
-  for (double k = 0; k < 20; k++) {
-    Canvas c{200, 200};
-    for (double i = 0; i < 200; i++) {
-      for (double j = 0; j < 200; j++) {
-        ray r{point(j * -0.04 + 4.00, i * -0.04 + 4.00, -10), vector(0, 0, 1)};
-        r.origin = rot * r.origin;
-        r.direction = normalize(rot * r.direction);
+  for (double k = 0; k < 1; k++) {
+    Canvas c{800, 800};
+    s2.add_world_transform(roto_y(PI/2 + PI / 4));
+    s2.add_obj_transform(roto_z(PI/4));
+    for (double i = 0; i < 800; i++) {
+      for (double j = 0; j < 800; j++) {
+        ray r{point(j * -0.01 + 4.00, i * -0.01 + 4.00, -10), vector(0, 0, 1)};
         std::vector<intersection> hits = s.intersects(r);
         std::vector<intersection> temp = s2.intersects(r);
         hits.insert(hits.end(), temp.begin(), temp.end());
@@ -302,9 +301,8 @@ int main() {
       // std::cout << std::endl;
     }
 
-    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int(k + 20)) +
-                         std::string(".ppm"));
-    rot = rot * rot_const;
+    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int(k)) + std::string(".ppm"));
+    //rot = rot * rot_const;
   }
 
   /*

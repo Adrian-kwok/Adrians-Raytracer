@@ -2,6 +2,7 @@
 #define RAY
 
 #include <vector>
+#include <memory>
 
 #include "color.h"
 #include "matrix_transform.h"
@@ -51,23 +52,6 @@ class obj {
   tuple apply_transform(const tuple& t) const;
 };
 
-// this is temporary and should be replaced with an abc
-// for which different types of lights derive themselves from
-struct point_light : public obj {
-  color intensity;
-
-  point_light(color c);
-};
-
-// object to be rendered
-class render_obj : public obj {
- public:
-  // assumed to be a point on the surface of the object
-  virtual tuple normal_at(tuple p) const = 0;
-
-  virtual std::vector<intersection> intersects(const ray& r) const = 0;
-};
-
 struct intersection {
   double t;
   const obj* o;
@@ -77,8 +61,8 @@ struct intersection {
 struct material {
   color c = color{1, 1, 1};
   float ambient = 0.1;
-  float diffuse = 0.9;
-  float specular = 0.9;
+  float diffuse = 0.5;
+  float specular = 1;
   float shininess = 200.0;
 };
 
@@ -92,10 +76,29 @@ const intersection NOINT{0, nullptr};
 // be when the object "blocks" the ray
 intersection hit(const std::vector<intersection>& hits);
 
+struct light;
+
 // lighting function, should eventually be changed from point
 // light to just a general light abstract base class
 // position is a point, eye and normal are vectors
-color lighting(const material& m, const point_light& l, const tuple& position,
+color lighting(const material& m, const light& l, const tuple& position,
                const tuple& eye, const tuple& normal);
+
+// object to be rendered
+class render_obj : public obj {
+ public:
+  // probably (maybe?) should add virtual big 5 when needed
+  // assumed to be a point on the surface of the object
+  virtual tuple normal_at(tuple p) const = 0;
+
+  virtual std::vector<intersection> intersects(const ray& r) const = 0;
+};
+
+struct light : public obj {
+  virtual color intensity() const = 0;
+
+  // returns a normalized vector
+  virtual tuple light_vec(tuple posn) const = 0;
+};
 
 #endif

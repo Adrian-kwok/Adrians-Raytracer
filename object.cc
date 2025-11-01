@@ -34,7 +34,7 @@ tuple sphere::normal_at(tuple p) const {
   p = apply_transform(p);
 
   tuple object_norm = p - ORIGIN;  // object space normal
-  object_norm = transpose(get_world_inverse() * get_obj_inverse()) * object_norm;
+  object_norm = transpose(get_obj_inverse() * get_world_inverse()) * object_norm;
   object_norm.w = 0;
 
   return normalize(object_norm);  // back to world space
