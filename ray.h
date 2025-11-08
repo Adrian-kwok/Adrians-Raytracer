@@ -1,8 +1,8 @@
 #ifndef RAY
 #define RAY
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "color.h"
 #include "matrix_transform.h"
@@ -28,6 +28,9 @@ class obj {
   Matrix obj_transform = identity(4);
   Matrix obj_inverse = identity(4);
 
+  protected:
+  virtual ~obj() = 0;
+
  public:
   // sets to a specific matrix
   void set_world_transform(const Matrix& m);
@@ -52,9 +55,11 @@ class obj {
   tuple apply_transform(const tuple& t) const;
 };
 
+struct render_obj;
+
 struct intersection {
   double t;
-  const obj* o;
+  const render_obj* o;
 };
 
 // used with render objects
@@ -76,18 +81,17 @@ const intersection NOINT{0, nullptr};
 // be when the object "blocks" the ray
 intersection hit(const std::vector<intersection>& hits);
 
-struct light;
-
-// lighting function, should eventually be changed from point
-// light to just a general light abstract base class
-// position is a point, eye and normal are vectors
-color lighting(const material& m, const light& l, const tuple& position,
-               const tuple& eye, const tuple& normal);
-
 // object to be rendered
 class render_obj : public obj {
  public:
   // probably (maybe?) should add virtual big 5 when needed
+  virtual ~render_obj() = default;
+
+  // creates a unique pointer to a clone of the object
+  virtual std::unique_ptr<render_obj> clone() const = 0;
+
+  virtual material mat_at(tuple p) const = 0;
+
   // assumed to be a point on the surface of the object
   virtual tuple normal_at(tuple p) const = 0;
 
@@ -95,10 +99,32 @@ class render_obj : public obj {
 };
 
 struct light : public obj {
+  virtual ~light() = default;
+
   virtual color intensity() const = 0;
+
+  // creates a unique pointer to a clone of the object
+  virtual std::unique_ptr<light> clone() const = 0;
 
   // returns a normalized vector
   virtual tuple light_vec(tuple posn) const = 0;
 };
+
+struct computation {
+  bool inside;
+  double time;
+  const render_obj* o;
+  tuple p;
+  tuple eyev;
+  tuple normalv;
+
+  computation(const intersection& i, const ray& r);
+};
+
+// lighting function, should eventually be changed from point
+// light to just a general light abstract base class
+// position is a point, eye and normal are vectors
+color lighting(const material& m, const light& l, const tuple& position,
+               const tuple& eye, const tuple& normal);
 
 #endif

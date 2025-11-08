@@ -7,6 +7,10 @@ double determinant(double a, double b, double c) {
 }
 
 
+std::unique_ptr<render_obj> sphere::clone() const {
+  return std::unique_ptr<sphere>(new sphere{*this});
+}
+
 std::vector<intersection> sphere::intersects(const ray& r) const {
   ray rmod = apply_transform(r);
 
@@ -38,4 +42,8 @@ tuple sphere::normal_at(tuple p) const {
   object_norm.w = 0;
 
   return normalize(object_norm);  // back to world space
+}
+
+material sphere::mat_at(tuple p) const {
+  return mat;
 }

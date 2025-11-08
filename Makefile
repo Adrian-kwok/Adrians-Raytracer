@@ -2,13 +2,16 @@ CC		= g++
 ASAN_FLAGS	= -fsanitize=address
 CFLAGS		:= -Wall
 
-objects := main.o light.o canvas.o color.o object.o ray.o matrix_transform.o matrix.o tuples.o double_eq.o
+objects := light.o canvas.o color.o object.o ray.o matrix_transform.o matrix.o tuples.o double_eq.o world.o main.o
 
 raytrace: $(objects)
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) $^ -o $@ 
 
-main.o: main.cc light.h object.h canvas.h
+main.o: light.h object.h canvas.h world.h main.cc
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c main.cc
+
+world.o: world.cc ray.h
+	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c world.cc 
 
 light.o: light.cc ray.h
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c light.cc

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+obj::~obj() = default;
+
 void obj::set_world_transform(const Matrix& m) {
   world_transform = m;
   world_inverse = inverse(world_transform);
@@ -98,11 +100,23 @@ color lighting(const material& m, const light& l, const tuple& position,
     double reflect_dot_eye = dot(reflect(lightvec, normal), eye);
     if (reflect_dot_eye > 0) {
       // compute specular contribution
-      specular = l.intensity() * m.specular *
-                 pow(reflect_dot_eye, m.shininess);
+      specular = l.intensity() * m.specular * pow(reflect_dot_eye, m.shininess);
     }
   }
 
-  //return ambient + diffuse + specular;
+  // return ambient + diffuse + specular;
   return ambient + diffuse + specular;
+}
+
+computation::computation(const intersection& i, const ray& r)
+    : time{i.t},
+      o{i.o},
+      p{r.position(i.t)},
+      eyev{-r.direction},
+      normalv{i.o->normal_at(p)},
+      inside{false} {
+  if (dot(normalv, eyev) < 0) {
+    inside = true;
+    normalv = -normalv;
+  }
 }

@@ -7,6 +7,7 @@
 #include "object.h"
 #include "ray.h"
 #include "tuples.h"
+#include "world.h"
 
 void display(Canvas& c) {
   int w, h;
@@ -253,6 +254,7 @@ int main() {
   */
   // display(clock);
 
+  /*
   sphere s;
   s.mat = material{color{0, 0.4, 1}, 0.1, 0.9, 0.9, 200};
   s.add_obj_transform(scale(1.5, 1.5, 1.5));
@@ -304,6 +306,7 @@ int main() {
     canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int(k)) + std::string(".ppm"));
     //rot = rot * rot_const;
   }
+  */
 
   /*
   material m;
@@ -335,4 +338,37 @@ int main() {
   p_color(lighting(m,light,position,eyev,normalv));
 
   */
+
+  World w;
+  w.add_light(std::unique_ptr<light>(new point_light{color{1,1,1}}));
+  w.light_at(0).set_world_transform(translate(-10,10,-10));
+  sphere s{};
+  s.mat = material{color{0.8, 1.0, 0.6}, 0.1, 0.7, 0.2,200};
+  w.add_obj(s);
+  w.add_obj(sphere{});
+  w.obj_at(1).set_obj_transform(scale(0.5,0.5,0.5));
+  
+  ray r {point(0,0,-5), vector(0,0,1)};
+  p_color(w.color_at(r));
+  std::vector<intersection> hits = w.intersect(r);
+  for (auto it : hits) {
+    std::cout << it.t << std::endl;
+  }
+
+  computation c{intersection{4, w.ptr_obj_at(0)}, r};
+  std::cout << c.time << std::endl;
+  std::cout << std::boolalpha << (c.o == w.ptr_obj_at(0)) << std::endl;
+  std::cout << std::boolalpha << c.inside << std::endl;
+  p_point(c.p);
+  p_point(c.eyev);
+  p_point(c.normalv);
+
+  World w2;
+  p_color(w2.color_at(r));
+  p_color(w.color_at(r));
+   p_color(w.color_at(ray{point(0,0,0.75), vector(0,0,-1)}));
+
+  
+
+  // just keep going and see if the world functions can render the original scene properly...
 }
