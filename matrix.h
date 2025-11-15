@@ -23,6 +23,8 @@ class Matrix {
   Matrix& operator=(const Matrix& m);
   Matrix& operator=(Matrix&& m);
 
+  bool operator==(const Matrix& other);
+
   int num_rows() const;
   int num_cols() const;
 

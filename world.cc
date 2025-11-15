@@ -114,3 +114,101 @@ color World::color_at(const ray& r) const {
 color World::background_col() const {
   return bg;
 }
+
+Matrix view_transform(tuple from, tuple to, tuple up) {
+  // creating vectors which serve as the new axis for the transformation
+  tuple forward = normalize(to - from);
+  tuple left = cross(forward, normalize(up));
+  tuple true_up = cross(left, forward);
+
+  // creating the transformation matrix
+  Matrix orientation = identity(TUPLE_SIZE);
+
+  orientation.set(0,0,left.x);
+  orientation.set(0,1,left.y);
+  orientation.set(0,2,left.z);
+  orientation.set(1,0,true_up.x);
+  orientation.set(1,1,true_up.y);
+  orientation.set(1,2,true_up.z);
+  orientation.set(2,0,-forward.x);
+  orientation.set(2,1,-forward.y);
+  orientation.set(2,2,-forward.z);
+
+  return orientation * translate(-from.x, -from.y, -from.z);
+}
+
+void Camera::update_pixel_size() {
+  // calculations assume that the canvas is 1 unit away from the camera
+  double half_view = tan(fov / 2);
+  double aspect = double(hsize) / double(vsize);
+  
+  half_width = aspect >= 1 ? half_view : half_view * aspect;
+  half_height = aspect >= 1 ? half_view / aspect : half_view;
+
+  pixel_size = (half_width * 2) / hsize;
+}
+
+Camera::Camera(int h, int v, double fov): hsize{h}, vsize{v}, fov{fov} {
+  update_pixel_size();
+}
+int Camera::get_hsize() const {return hsize;}
+int Camera::get_vsize() const {return vsize;}
+double Camera::get_fov() const {return fov;}
+double Camera::get_pixel_size() const {return pixel_size;}
+const Matrix & Camera::get_transform() const {return transform;}
+
+void Camera::set_hsize(int h) {
+  hsize = h;
+  update_pixel_size();
+}
+
+void Camera::set_vsize(int v) {
+  vsize = v;
+  update_pixel_size();
+}
+
+void Camera::set_fov(double new_fov) {
+  fov = new_fov;
+  update_pixel_size();
+}
+
+void Camera::set_transform(const Matrix& m) {
+  transform = m;
+  inverse_transform = inverse(transform);
+}
+
+void Camera::set_transform(Matrix&& m) {
+  std::swap(transform, m);
+  inverse_transform = inverse(transform);
+}
+
+void Camera::add_transform(const Matrix& m) {
+  transform = m * transform;
+  inverse_transform = inverse(transform);
+}
+
+ray Camera::ray_for_pixel(int x, int y) const {
+  // 0.5 is used to get the center of a pixel for a ray to hit
+  double world_x = half_width - ((x + 0.5) * pixel_size);
+  double world_y = half_height - ((y + 0.5) * pixel_size);
+
+  // canvas is taken to be at z = -1
+  tuple pixel = inverse_transform * point(world_x, world_y, -1);
+  tuple origin = inverse_transform * ORIGIN;
+  pixel.w = 1;// oops!
+  origin.w = 1;
+  return ray{origin, normalize(pixel - origin)};
+}
+
+Canvas Camera::render(const World& w) const {
+  Canvas image {hsize, vsize};
+
+  for (int y = 0; y < vsize; y++) {
+    for (int x = 0; x < hsize; x++) {
+      image.write_pixel(x,y,w.color_at(ray_for_pixel(x,y)));
+    }
+  }
+
+  return image;
+}
+

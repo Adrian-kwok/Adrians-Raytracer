@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <iostream>
 
 #include "canvas.h"
@@ -47,6 +48,22 @@ void p_point(const tuple& t) {
     std::cout << t.get(i);
   }
   std::cout << ")" << std::endl;
+}
+
+void p_mat(const Matrix& m) {
+  std::cout << std::fixed << std::setprecision(5);
+
+  for (int i = 0; i < m.num_rows(); i++) {
+    std::cout << "|";
+    for (int j = 0; j < m.num_cols(); j++) {
+      if (m.get(i,j) >= 0) {
+        std::cout << " ";
+      }
+      std::cout << m.get(i, j);
+      std::cout << "|";
+    }
+    std::cout << std::endl;
+  }
 }
 
 void p_color(const color& c) {
@@ -303,7 +320,8 @@ int main() {
       // std::cout << std::endl;
     }
 
-    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int(k)) + std::string(".ppm"));
+    canvas_to_ppm(c, std::string("img/sphere") + std::to_string(int(k)) +
+  std::string(".ppm"));
     //rot = rot * rot_const;
   }
   */
@@ -338,37 +356,117 @@ int main() {
   p_color(lighting(m,light,position,eyev,normalv));
 
   */
+  /*
+    World w;
+    w.add_light(std::unique_ptr<light>(new point_light{color{1,1,1}}));
+    w.light_at(0).set_world_transform(translate(-10,10,-10));
+    sphere s{};
+    s.mat = material{color{0.8, 1.0, 0.6}, 0.1, 0.7, 0.2,200};
+    w.add_obj(s);
+    w.add_obj(sphere{});
+    w.obj_at(1).set_obj_transform(scale(0.5,0.5,0.5));
+
+    ray r {point(0,0,-5), vector(0,0,1)};
+    p_color(w.color_at(r));
+    std::vector<intersection> hits = w.intersect(r);
+    for (auto it : hits) {
+      std::cout << it.t << std::endl;
+    }
+
+    computation c{intersection{4, w.ptr_obj_at(0)}, r};
+    std::cout << c.time << std::endl;
+    std::cout << std::boolalpha << (c.o == w.ptr_obj_at(0)) << std::endl;
+    std::cout << std::boolalpha << c.inside << std::endl;
+    p_point(c.p);
+    p_point(c.eyev);
+    p_point(c.normalv);
+
+    World w2;
+    p_color(w2.color_at(r));
+    p_color(w.color_at(r));
+     p_color(w.color_at(ray{point(0,0,0.75), vector(0,0,-1)}));
+  */
+
+ 
+  std::cout << std::boolalpha << (identity(4) == view_transform(ORIGIN, point(0, 0, -1), vector(0, 1, 0))) << std::endl;
+  p_mat(view_transform(ORIGIN, point(0, 0, -1), vector(0, 1, 0)));
+  std::cout << std::boolalpha << (scale(-1, 1, -1) == view_transform(ORIGIN, point(0, 0, 1), vector(0, 1, 0))) << std::endl;
+  std::cout << std::boolalpha << (translate(0, 0, -8) == view_transform(point(0, 0, 8), ORIGIN, vector(0, 1, 0))) << std::endl;
+
+  p_mat(view_transform(point(1,3,2), point(4,-2,8),vector(1,1,0)));
+
+  Camera c{160, 120, PI / 2};
+  std::cout << c.get_hsize() << std::endl;
+  std::cout << c.get_vsize() << std::endl;
+  std::cout << c.get_fov() << std::endl;
+  p_mat(c.get_transform());
+  std::cout << Camera{200, 125, PI / 2}.get_pixel_size() << std::endl;
+  std::cout << Camera{125, 200, PI / 2}.get_pixel_size() << std::endl;
+
+  Camera c1{201, 101, PI /2};
+  ray r1 = c1.ray_for_pixel(100, 50);
+  p_point(r1.origin);
+  p_point(r1.direction);
+
+  ray r2 = c1.ray_for_pixel(0,0);
+  p_point(r2.origin);
+  p_point(r2.direction);
+
+  c1.add_transform(roto_y(PI/4) * translate(0, -2, 5));
+  ray r3 = c1.ray_for_pixel(100, 50);
+  p_point(r3.origin);
+  p_point(r3.direction);
 
   World w;
-  w.add_light(std::unique_ptr<light>(new point_light{color{1,1,1}}));
-  w.light_at(0).set_world_transform(translate(-10,10,-10));
-  sphere s{};
-  s.mat = material{color{0.8, 1.0, 0.6}, 0.1, 0.7, 0.2,200};
-  w.add_obj(s);
-  w.add_obj(sphere{});
-  w.obj_at(1).set_obj_transform(scale(0.5,0.5,0.5));
+  point_light p {color {0.9,0.9,0.9}};
+  p.add_world_transform(translate(-10,10,-20));
+  w.add_light(p);
+
+  point_light q {color {0.4, 0.4,0.4}};
+  q.add_world_transform(translate(3, 0, -1));
+  w.add_light(q);
+
+  sphere floor;
+  floor.mat = material{color{1, 0.9, 0.9}};
+  floor.mat.specular = 0;
+  floor.add_obj_transform(scale(10, 0.01, 10));
+  w.add_obj(floor);
   
-  ray r {point(0,0,-5), vector(0,0,1)};
-  p_color(w.color_at(r));
-  std::vector<intersection> hits = w.intersect(r);
-  for (auto it : hits) {
-    std::cout << it.t << std::endl;
-  }
+  sphere left_wall = floor;
+  left_wall.add_world_transform(translate(0,0,5) * roto_y(-PI/4) * roto_x(PI / 2));
+  w.add_obj(left_wall);
 
-  computation c{intersection{4, w.ptr_obj_at(0)}, r};
-  std::cout << c.time << std::endl;
-  std::cout << std::boolalpha << (c.o == w.ptr_obj_at(0)) << std::endl;
-  std::cout << std::boolalpha << c.inside << std::endl;
-  p_point(c.p);
-  p_point(c.eyev);
-  p_point(c.normalv);
+  sphere right_wall = floor;
+  right_wall.add_world_transform(translate(0,0,5) * roto_x(PI / 2));
+  w.add_obj(right_wall);
 
-  World w2;
-  p_color(w2.color_at(r));
-  p_color(w.color_at(r));
-   p_color(w.color_at(ray{point(0,0,0.75), vector(0,0,-1)}));
+  sphere middle;
+  middle.add_world_transform(translate(-0.5, 1, 0.5));
+  middle.mat.c = color{0.1,1,0.5};
+  middle.mat.diffuse = 0.7;
+  middle.mat.specular = 1;
+  w.add_obj(middle);
 
-  
+  sphere right;
+  right.set_world_transform(translate(1.5,0.5,-0.5));
+  right.set_obj_transform(scale(0.5,0.5,0.5));
+  right.mat.c = color{0.4,0.4,0.4};
+  right.mat.diffuse = 0.2;
+  right.mat.specular = 1;
+  right.mat.shininess = 900;
+  w.add_obj(right);
 
-  // just keep going and see if the world functions can render the original scene properly...
+  sphere left;
+  left.set_world_transform(translate(-1.5, 0.33, -0.75));
+  left.set_obj_transform(scale(0.33,0.33,0.33));
+  left.mat.c = color {1, 0.8, 0.1};
+  left.mat.diffuse = 0.8;
+  left.mat.specular = 1;
+  w.add_obj(left);
+
+  Camera cam{1000, 500, PI/3};
+  cam.set_transform(view_transform(point(0,1.5, -5), point(0, 1,0), vector(0,1,0)));
+
+  canvas_to_ppm(cam.render(w), "img/aaa.ppm");
 }
+

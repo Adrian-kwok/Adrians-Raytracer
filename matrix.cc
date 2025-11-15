@@ -54,28 +54,17 @@ Matrix::Matrix(Matrix&& m)
 Matrix& Matrix::operator=(const Matrix& m) {
   if (&m == this) return *this;
 
-  if (data != nullptr) {
-    for (int i = 0; i < row_dim; i++) {
-      delete[] data[i];
-    }
-    delete[] data;
-  }
-
-  row_dim = m.row_dim;
-  col_dim = m.col_dim;
-
-  data = new double*[row_dim];
-  for (int i = 0; i < row_dim; i++) {
-    data[i] = new double[col_dim];
-    for (int j = 0; j < col_dim; j++) {
-      data[i][j] = m.data[i][j];
-    }
-  }
+  Matrix temp {m};
+  std::swap(data, temp.data);
+  std::swap(row_dim, temp.row_dim);
+  std::swap(col_dim, temp.col_dim);
 
   return *this;
 }
 
 Matrix& Matrix::operator=(Matrix&& m) {
+  if (&m == this) return *this;
+
   std::swap(data, m.data);
   std::swap(row_dim, m.row_dim);
   std::swap(col_dim, m.col_dim);
@@ -284,4 +273,19 @@ Matrix inverse(const Matrix& m) {
   }
 
   return transpose(inv);
+}
+
+bool Matrix::operator==(const Matrix& other) {
+  if (other.col_dim == col_dim && other.row_dim == row_dim) {
+    for (int i = 0; i < col_dim; i++) {
+      for (int j = 0; j < row_dim; j++) {
+        if (get(i,j) != other.get(i,j)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  } else {
+    return false;
+  }
 }

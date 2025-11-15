@@ -97,7 +97,8 @@ color lighting(const material& m, const light& l, const tuple& position,
     diffuse = effective * m.diffuse * light_dot_normal;
 
     // how close is the eye vector to ideal reflection?
-    double reflect_dot_eye = dot(reflect(lightvec, normal), eye);
+    // eye is negative here because it just needs to work with the world class
+    double reflect_dot_eye = dot(reflect(lightvec, normal), -eye);
     if (reflect_dot_eye > 0) {
       // compute specular contribution
       specular = l.intensity() * m.specular * pow(reflect_dot_eye, m.shininess);
