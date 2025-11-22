@@ -387,7 +387,6 @@ int main() {
      p_color(w.color_at(ray{point(0,0,0.75), vector(0,0,-1)}));
   */
 
- 
   std::cout << std::boolalpha << (identity(4) == view_transform(ORIGIN, point(0, 0, -1), vector(0, 1, 0))) << std::endl;
   p_mat(view_transform(ORIGIN, point(0, 0, -1), vector(0, 1, 0)));
   std::cout << std::boolalpha << (scale(-1, 1, -1) == view_transform(ORIGIN, point(0, 0, 1), vector(0, 1, 0))) << std::endl;
@@ -418,12 +417,12 @@ int main() {
   p_point(r3.direction);
 
   World w;
-  point_light p {color {0.9,0.9,0.9}};
+  point_light p {color {0.6,0.6,0.6}};
   p.add_world_transform(translate(-10,10,-20));
   w.add_light(p);
 
-  point_light q {color {0.4, 0.4,0.4}};
-  q.add_world_transform(translate(3, 0, -1));
+  point_light q {color {0.6, 0.6,0.6}};
+  q.add_world_transform(translate(5, 1, 2));
   w.add_light(q);
 
   sphere floor;
@@ -468,5 +467,28 @@ int main() {
   cam.set_transform(view_transform(point(0,1.5, -5), point(0, 1,0), vector(0,1,0)));
 
   canvas_to_ppm(cam.render(w), "img/aaa.ppm");
-}
+  /*
+ point_light l {color{1,1,1}};
+ l.add_world_transform(translate(0,0,-10));
+
+  p_color(lighting(material{}, l,ORIGIN, vector(0,0,-1),vector(0,0,-1), true));
+
+  // the shadow calculations need testing
+
+  point_light regular {color{1,1,1}};
+  regular.set_world_transform(translate(-10,10,-10));
+
+  World w1;
+  w1.add_light(regular);
+  std::cout << w1.inShadow(0,point(0, 10, 0)) << std::endl;
+
+  sphere s;
+  w1.add_obj(s);
+
+  std::cout << w1.inShadow(0,point(10, -10, 10)) << std::endl;
+  std::cout << w1.inShadow(0,point(10, -10, 10) * -2) << std::endl;
+  std::cout << w1.inShadow(0,point(-2, 2, -2)) << std::endl;
+
+  */
+  }
 

@@ -79,7 +79,7 @@ ray ray::transform(const Matrix& m) const {
 }
 
 color lighting(const material& m, const light& l, const tuple& position,
-               const tuple& eye, const tuple& normal) {
+               const tuple& eye, const tuple& normal, bool in_shadow) {
   color ambient;
   color diffuse = BLACK;   // default
   color specular = BLACK;  // ""
@@ -89,6 +89,11 @@ color lighting(const material& m, const light& l, const tuple& position,
   // direction to light source
   tuple lightvec = l.light_vec(position);
   ambient = effective * m.ambient;
+
+  // Case for shadows
+  if (in_shadow) {
+    return ambient;
+  }
 
   // cosine of angle between light and normal, if negative then light is on the
   // other side
@@ -116,6 +121,11 @@ computation::computation(const intersection& i, const ray& r)
       eyev{-r.direction},
       normalv{i.o->normal_at(p)},
       inside{false} {
+
+  // before we maybe fix the normal vector, we calculate the offset normal
+  // if normal maps are implemented, should this be changed to be a strictly geometric normal? unsure
+  offset_p = p + normalv * EPSILON;
+  
   if (dot(normalv, eyev) < 0) {
     inside = true;
     normalv = -normalv;

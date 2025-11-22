@@ -95,7 +95,8 @@ int World::num_light() const {return lights.size();}
 color World::shade_hit(const computation& c) const{
   color result = BLACK;
   for (int i = 0; i < lights.size(); i++) {
-    result = result + lighting(c.o->mat_at(c.p), *lights[i], c.p, c.eyev, c.normalv);
+    // with this implementation, wouldn't the ambient lighting add up to an annoying degree? unsure
+    result = result + lighting(c.o->mat_at(c.p), *lights[i], c.p, c.eyev, c.normalv, inShadow(i,c.offset_p));
   }
   return result;
 }
@@ -212,3 +213,12 @@ Canvas Camera::render(const World& w) const {
   return image;
 }
 
+bool World::inShadow(int lightind, tuple pt) const {
+
+  tuple lightvec  = pt - lights.at(lightind)->location();
+
+  ray lightray {lights.at(lightind)->location(), normalize(lightvec)};
+  intersection i = hit(intersect(lightray));
+
+  return i.o != nullptr && i.t < norm(lightvec);
+}

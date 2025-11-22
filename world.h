@@ -40,6 +40,8 @@ class World {
         color shade_hit(const computation& c) const;
         color color_at(const ray& r) const;
         color background_col() const;
+
+        bool inShadow(int lightind, tuple pt) const;
         
         std::vector<intersection> intersect(const ray& r) const;
 };

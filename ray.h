@@ -13,6 +13,7 @@ struct ray {
   tuple origin = ORIGIN;              // should be a point!
   tuple direction = vector(1, 0, 0);  // should be a vector!
 
+  // returns a point
   tuple position(double t) const;
   tuple reflect(const tuple& normal) const;
   // applies matrix transformation to ray
@@ -115,6 +116,7 @@ struct computation {
   double time;
   const render_obj* o;
   tuple p;
+  tuple offset_p;
   tuple eyev;
   tuple normalv;
 
@@ -125,6 +127,6 @@ struct computation {
 // light to just a general light abstract base class
 // position is a point, eye and normal are vectors
 color lighting(const material& m, const light& l, const tuple& position,
-               const tuple& eye, const tuple& normal);
+               const tuple& eye, const tuple& normal, bool in_shadow);
 
 #endif
