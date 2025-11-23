@@ -131,3 +131,14 @@ computation::computation(const intersection& i, const ray& r)
     normalv = -normalv;
   }
 }
+
+tuple render_obj::normal_at(tuple p) const {
+  if (p.w != 1) std::cerr << "not a point, error" << std::endl;
+  p = apply_transform(p);
+
+  tuple object_norm = normal_at_local(p);  // object space normal
+
+  object_norm = transpose(get_obj_inverse() * get_world_inverse()) * object_norm;
+  object_norm.w = 0;
+  return normalize(object_norm);  // back to world space
+}

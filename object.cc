@@ -33,15 +33,8 @@ std::vector<intersection> sphere::intersects(const ray& r) const {
 }
 
 // should be taking in a point
-tuple sphere::normal_at(tuple p) const {
-  if (p.w != 1) std::cerr << "not a point, error" << std::endl;
-  p = apply_transform(p);
-
-  tuple object_norm = p - ORIGIN;  // object space normal
-  object_norm = transpose(get_obj_inverse() * get_world_inverse()) * object_norm;
-  object_norm.w = 0;
-
-  return normalize(object_norm);  // back to world space
+tuple sphere::normal_at_local(tuple p) const {
+  return p - ORIGIN;  // object space normal
 }
 
 material sphere::mat_at(tuple p) const {

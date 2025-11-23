@@ -84,6 +84,8 @@ intersection hit(const std::vector<intersection>& hits);
 
 // object to be rendered
 class render_obj : public obj {
+  virtual tuple normal_at_local(tuple p) const = 0;
+
  public:
   // probably (maybe?) should add virtual big 5 when needed
   virtual ~render_obj() = default;
@@ -94,7 +96,7 @@ class render_obj : public obj {
   virtual material mat_at(tuple p) const = 0;
 
   // assumed to be a point on the surface of the object
-  virtual tuple normal_at(tuple p) const = 0;
+  tuple normal_at(tuple p) const;
 
   virtual std::vector<intersection> intersects(const ray& r) const = 0;
 };
