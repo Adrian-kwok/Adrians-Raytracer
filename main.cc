@@ -425,18 +425,17 @@ int main() {
   q.add_world_transform(translate(5, 1, 2));
   w.add_light(q);
 
-  sphere floor;
+  plane floor;
   floor.mat = material{color{1, 0.9, 0.9}};
   floor.mat.specular = 0;
-  floor.add_obj_transform(scale(10, 0.01, 10));
   w.add_obj(floor);
   
-  sphere left_wall = floor;
-  left_wall.add_world_transform(translate(0,0,5) * roto_y(-PI/4) * roto_x(PI / 2));
+  plane left_wall = floor;
+  left_wall.add_world_transform(translate(0,0,5) * roto_y(-PI/4) * roto_x(-PI / 2));
   w.add_obj(left_wall);
 
-  sphere right_wall = floor;
-  right_wall.add_world_transform(translate(0,0,5) * roto_x(PI / 2));
+  plane right_wall = floor;
+  right_wall.add_world_transform(translate(0,0,5) * roto_x(-PI / 2));
   w.add_obj(right_wall);
 
   sphere middle;
@@ -463,7 +462,7 @@ int main() {
   left.mat.specular = 1;
   w.add_obj(left);
 
-  Camera cam{1000, 500, PI/3};
+  Camera cam{100, 100, PI/3};
   cam.set_transform(view_transform(point(0,1.5, -5), point(0, 1,0), vector(0,1,0)));
 
   canvas_to_ppm(cam.render(w), "img/aaa.ppm");

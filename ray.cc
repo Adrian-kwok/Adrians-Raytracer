@@ -138,7 +138,12 @@ tuple render_obj::normal_at(tuple p) const {
 
   tuple object_norm = normal_at_local(p);  // object space normal
 
-  object_norm = transpose(get_obj_inverse() * get_world_inverse()) * object_norm;
+  object_norm = transpose(get_world_inverse() * get_obj_inverse()) * object_norm;
   object_norm.w = 0;
   return normalize(object_norm);  // back to world space
+}
+
+
+std::vector<intersection> render_obj::intersects(const ray& r) const {
+  return intersects_local(apply_transform(r));
 }

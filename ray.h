@@ -67,8 +67,8 @@ struct intersection {
 struct material {
   color c = color{1, 1, 1};
   float ambient = 0.1;
-  float diffuse = 0.5;
-  float specular = 1;
+  float diffuse = 0.7;
+  float specular = 0.9;
   float shininess = 200.0;
 };
 
@@ -85,8 +85,12 @@ intersection hit(const std::vector<intersection>& hits);
 // object to be rendered
 class render_obj : public obj {
   virtual tuple normal_at_local(tuple p) const = 0;
-
+  virtual std::vector<intersection> intersects_local(const ray& r) const = 0;
+  
  public:
+  // at some point there will be a need for polymorphic materials, be paitient
+  material mat;
+
   // probably (maybe?) should add virtual big 5 when needed
   virtual ~render_obj() = default;
 
@@ -98,7 +102,7 @@ class render_obj : public obj {
   // assumed to be a point on the surface of the object
   tuple normal_at(tuple p) const;
 
-  virtual std::vector<intersection> intersects(const ray& r) const = 0;
+  std::vector<intersection> intersects(const ray& r) const;
 };
 
 struct light : public obj {
