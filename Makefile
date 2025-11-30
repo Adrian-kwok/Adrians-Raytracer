@@ -2,7 +2,7 @@ CC		= g++
 ASAN_FLAGS	= -fsanitize=address
 CFLAGS		:= -Wall
 
-objects := light.o canvas.o color.o object.o ray.o matrix_transform.o matrix.o tuples.o double_eq.o world.o main.o
+objects := light.o render_obj.o material.o canvas.o color.o object.o ray.o matrix_transform.o matrix.o tuples.o double_eq.o world.o main.o
 
 raytrace: $(objects)
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) $^ -o $@ 
@@ -13,8 +13,14 @@ main.o: light.h object.h canvas.h world.h main.cc
 world.o: world.cc ray.h
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c world.cc 
 
+render_obj.o: render_obj.cc material.h light.h
+	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c render_obj.cc
+
 light.o: light.cc ray.h
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c light.cc
+
+material.o: material.cc ray.h
+	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c material.cc
 
 canvas.o: canvas.cc color.h
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c canvas.cc
@@ -22,7 +28,7 @@ canvas.o: canvas.cc color.h
 color.o: color.cc double_eq.h
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c color.cc
 
-object.o: object.cc ray.h
+object.o: object.cc render_obj.h
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -c object.cc
 
 ray.o: ray.cc matrix_transform.h

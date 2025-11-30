@@ -1,7 +1,7 @@
 #ifndef WORLD
 #define WORLD
 
-#include "ray.h"
+#include "render_obj.h"
 #include "canvas.h"
 
 #include <vector>

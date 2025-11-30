@@ -52,87 +52,12 @@ class obj {
   // gives location in world space, returns a point
   tuple location() const;
 
+  // converts to object space
   ray apply_transform(const ray& r) const;
+  // converts to object space
   tuple apply_transform(const tuple& t) const;
+
+  // perhaps consider a set of helper functions that convert from object space to world space?
 };
-
-struct render_obj;
-
-struct intersection {
-  double t;
-  const render_obj* o;
-};
-
-// used with render objects
-struct material {
-  color c = color{1, 1, 1};
-  float ambient = 0.1;
-  float diffuse = 0.7;
-  float specular = 0.9;
-  float shininess = 200.0;
-};
-
-// vector from object to ray
-tuple obj_to_ray(const obj& o, const ray& r);
-
-const intersection NOINT{0, nullptr};
-
-// given a vector of intersections between object and array, chooses the
-// smallest non-negative time value that is returns the intersection which would
-// be when the object "blocks" the ray
-intersection hit(const std::vector<intersection>& hits);
-
-// object to be rendered
-class render_obj : public obj {
-  virtual tuple normal_at_local(tuple p) const = 0;
-  virtual std::vector<intersection> intersects_local(const ray& r) const = 0;
-  
- public:
-  // at some point there will be a need for polymorphic materials, be paitient
-  material mat;
-
-  // probably (maybe?) should add virtual big 5 when needed
-  virtual ~render_obj() = default;
-
-  // creates a unique pointer to a clone of the object
-  virtual std::unique_ptr<render_obj> clone() const = 0;
-
-  virtual material mat_at(tuple p) const = 0;
-
-  // assumed to be a point on the surface of the object
-  tuple normal_at(tuple p) const;
-
-  std::vector<intersection> intersects(const ray& r) const;
-};
-
-struct light : public obj {
-  virtual ~light() = default;
-
-  virtual color intensity() const = 0;
-
-  // creates a unique pointer to a clone of the object
-  virtual std::unique_ptr<light> clone() const = 0;
-
-  // returns a normalized vector
-  virtual tuple light_vec(tuple posn) const = 0;
-};
-
-struct computation {
-  bool inside;
-  double time;
-  const render_obj* o;
-  tuple p;
-  tuple offset_p;
-  tuple eyev;
-  tuple normalv;
-
-  computation(const intersection& i, const ray& r);
-};
-
-// lighting function, should eventually be changed from point
-// light to just a general light abstract base class
-// position is a point, eye and normal are vectors
-color lighting(const material& m, const light& l, const tuple& position,
-               const tuple& eye, const tuple& normal, bool in_shadow);
 
 #endif

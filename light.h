@@ -1,10 +1,21 @@
-#include "ray.h"
-
 #ifndef LIGHT
 #define LIGHT
 
-// this is temporary and should be replaced with an abc
-// for which different types of lights derive themselves from
+#include "ray.h"
+
+struct light : public obj {
+  virtual ~light() = default;
+
+  virtual color intensity() const = 0;
+
+  // creates a unique pointer to a clone of the object
+  virtual std::unique_ptr<light> clone() const = 0;
+
+  // returns a normalized vector
+  virtual tuple light_vec(tuple posn) const = 0;
+};
+
+// should make this in a separate module when new lights are added
 class point_light : public light {
   color light_col;
 

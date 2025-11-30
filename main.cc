@@ -427,7 +427,7 @@ int main() {
 
   plane floor;
   floor.mat = material{color{1, 0.9, 0.9}};
-  floor.mat.specular = 0;
+  floor.mat.set_specular(0);
   w.add_obj(floor);
   
   plane left_wall = floor;
@@ -440,26 +440,26 @@ int main() {
 
   sphere middle;
   middle.add_world_transform(translate(-0.5, 1, 0.5));
-  middle.mat.c = color{0.1,1,0.5};
-  middle.mat.diffuse = 0.7;
-  middle.mat.specular = 1;
+  middle.mat.set_color_pattern(solid_color{color{0.1,1,0.5}});
+  middle.mat.set_diffuse(0.7);
+  middle.mat.set_specular(0.4);
   w.add_obj(middle);
 
   sphere right;
   right.set_world_transform(translate(1.5,0.5,-0.5));
   right.set_obj_transform(scale(0.5,0.5,0.5));
-  right.mat.c = color{0.4,0.4,0.4};
-  right.mat.diffuse = 0.2;
-  right.mat.specular = 1;
-  right.mat.shininess = 900;
+  right.mat.set_color_pattern(solid_color{color{0.4,0.4,0.4}});
+  right.mat.set_diffuse(0.5);
+  right.mat.set_specular(1);
+  right.mat.set_shininess(900);
   w.add_obj(right);
 
   sphere left;
   left.set_world_transform(translate(-1.5, 0.33, -0.75));
   left.set_obj_transform(scale(0.33,0.33,0.33));
-  left.mat.c = color {1, 0.8, 0.1};
-  left.mat.diffuse = 0.8;
-  left.mat.specular = 1;
+  left.mat.set_color_pattern(solid_color{color{1, 0.8, 0.1}});
+  left.mat.set_diffuse(0.8);
+  left.mat.set_specular(1);
   w.add_obj(left);
 
   Camera cam{100, 100, PI/3};

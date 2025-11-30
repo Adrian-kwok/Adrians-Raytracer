@@ -1,7 +1,7 @@
 #ifndef OBJ
 #define OBJ
 
-#include "ray.h"
+#include "render_obj.h"
 
 class sphere final : public render_obj {
   tuple normal_at_local(tuple p) const override;
