@@ -60,6 +60,7 @@ class material {
   void set_shininess(const float& sh);
 
   const pattern& get_color_pattern() const;
+  //perhaps add a method that returns a pointer to the color pattern (non const)
   const float& get_ambient() const;
   const float& get_diffuse() const;
   const float& get_specular() const;

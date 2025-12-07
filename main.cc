@@ -9,6 +9,7 @@
 #include "ray.h"
 #include "tuples.h"
 #include "world.h"
+#include "concrete_material.h"
 
 void display(Canvas& c) {
   int w, h;
@@ -425,25 +426,32 @@ int main() {
   q.add_world_transform(translate(5, 1, 2));
   w.add_light(q);
 
+  gradient s {{color{1,1,0},color{1,1,0},color{0,0,0}, color{0,0,0}}, true, true};
+  s.add_world_transform(translate(0.5,0.5,0));
+  s.add_obj_transform(scale(0.1,0.1,0.1));
+
   plane floor;
   floor.mat = material{color{1, 0.9, 0.9}};
   floor.mat.set_specular(0);
-  w.add_obj(floor);
   
   plane left_wall = floor;
   left_wall.add_world_transform(translate(0,0,5) * roto_y(-PI/4) * roto_x(-PI / 2));
   w.add_obj(left_wall);
 
-  plane right_wall = floor;
-  right_wall.add_world_transform(translate(0,0,5) * roto_x(-PI / 2));
-  w.add_obj(right_wall);
 
   sphere middle;
-  middle.add_world_transform(translate(-0.5, 1, 0.5));
-  middle.mat.set_color_pattern(solid_color{color{0.1,1,0.5}});
+  middle.add_world_transform(scale(1,1,1));
+  middle.add_world_transform(translate(0, 1, 0.5));
+  middle.mat.set_color_pattern(s);
   middle.mat.set_diffuse(0.7);
   middle.mat.set_specular(0.4);
   w.add_obj(middle);
+
+  plane right_wall = floor;
+  right_wall.add_world_transform(translate(0,0,5) * roto_x(-PI / 2));
+  w.add_obj(right_wall);
+  
+  w.add_obj(floor);
 
   sphere right;
   right.set_world_transform(translate(1.5,0.5,-0.5));
@@ -457,12 +465,12 @@ int main() {
   sphere left;
   left.set_world_transform(translate(-1.5, 0.33, -0.75));
   left.set_obj_transform(scale(0.33,0.33,0.33));
-  left.mat.set_color_pattern(solid_color{color{1, 0.8, 0.1}});
+  left.mat.set_color_pattern(solid_color{color{0.3, 0.9, 0.1}});
   left.mat.set_diffuse(0.8);
   left.mat.set_specular(1);
   w.add_obj(left);
 
-  Camera cam{100, 100, PI/3};
+  Camera cam{300, 200, PI/3};
   cam.set_transform(view_transform(point(0,1.5, -5), point(0, 1,0), vector(0,1,0)));
 
   canvas_to_ppm(cam.render(w), "img/aaa.ppm");

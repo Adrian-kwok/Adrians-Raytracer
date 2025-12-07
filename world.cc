@@ -96,7 +96,7 @@ color World::shade_hit(const computation& c) const{
   color result = BLACK;
   for (int i = 0; i < lights.size(); i++) {
     // with this implementation, wouldn't the ambient lighting add up to an annoying degree? unsure
-    result = result + lighting(c.o->mat_at(c.p), *lights[i], c.p, c.eyev, c.normalv, inShadow(i,c.offset_p));
+    result = result + lighting(c.o->mat_at(c.p), *lights[i], c.p, c.eyev, c.normalv, inShadow(i,c.offset_p),c.local);
   }
   return result;
 }

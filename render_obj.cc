@@ -15,13 +15,14 @@ ray ray::transform(const Matrix& m) const {
 }
 
 color lighting(const material& m, const light& l, const tuple& position,
-               const tuple& eye, const tuple& normal, bool in_shadow) {
+               const tuple& eye, const tuple& normal, bool in_shadow, const tuple& local_position) {
   color ambient;
   color diffuse = BLACK;   // default
   color specular = BLACK;  // ""
 
   // combine the surface color with the light's color
-  color effective = m.get_color_pattern().pattern_at(position) * l.intensity();
+  // here the position is adjusted for the 
+  color effective = m.get_color_pattern().pattern_at(local_position) * l.intensity();
   // direction to light source
   tuple lightvec = l.light_vec(position);
   ambient = effective * m.get_ambient();
@@ -56,7 +57,8 @@ computation::computation(const intersection& i, const ray& r)
       p{r.position(i.t)},
       eyev{-r.direction},
       normalv{i.o->normal_at(p)},
-      inside{false} {
+      inside{false}, 
+      local{i.o->apply_transform(p)}{
 
   // before we maybe fix the normal vector, we calculate the offset normal
   // if normal maps are implemented, should this be changed to be a strictly geometric normal? unsure

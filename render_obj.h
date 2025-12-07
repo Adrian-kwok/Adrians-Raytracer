@@ -4,9 +4,10 @@
 #include "light.h"
 #include "material.h"
 
-
 struct render_obj;
 
+// there may be some way to get more efficiency by storing the local location instead
+// of recalculating... idk
 struct intersection {
   double t;
   const render_obj* o;
@@ -23,7 +24,7 @@ intersection hit(const std::vector<intersection>& hits);
 class render_obj : public obj {
   virtual tuple normal_at_local(tuple p) const = 0;
   virtual std::vector<intersection> intersects_local(const ray& r) const = 0;
-  
+
  public:
   // at some point there will be a need for polymorphic materials, be paitient
   material mat;
@@ -50,6 +51,7 @@ struct computation {
   tuple offset_p;
   tuple eyev;
   tuple normalv;
+  tuple local;
 
   computation(const intersection& i, const ray& r);
 };
@@ -58,7 +60,7 @@ struct computation {
 // light to just a general light abstract base class
 // position is a point, eye and normal are vectors
 color lighting(const material& m, const light& l, const tuple& position,
-               const tuple& eye, const tuple& normal, bool in_shadow);
+               const tuple& eye, const tuple& normal, bool in_shadow,
+               const tuple& local_position);
 
 #endif
-
