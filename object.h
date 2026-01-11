@@ -9,6 +9,7 @@ class sphere final : public render_obj {
 
  public:
   ~sphere() = default;
+  sphere();
 
   std::unique_ptr<render_obj> clone() const override;
   material mat_at(tuple p) const override;
@@ -21,6 +22,7 @@ class plane final : public render_obj {
 
  public:
   ~plane() = default;
+  plane();
 
   std::unique_ptr<render_obj> clone() const override;
   material mat_at(tuple p) const override;

@@ -1,7 +1,9 @@
 #include "material.h"
 
 color pattern::pattern_at(tuple point) const {
-  point = apply_transform(point);
+  if (!use_global) {
+    point = apply_transform(point);
+  }
 
   return pattern_at_local(point);
 }
@@ -62,6 +64,7 @@ void material::set_shininess(const float& sh) {shininess = sh;}
 const pattern& material::get_color_pattern() const {
   return *color_pattern;
 }
+pattern& material::get_color_pattern() {return *color_pattern;}
 const float& material::get_ambient() const {return ambient;}
 const float& material::get_diffuse() const {return diffuse;}
 const float& material::get_specular() const {return specular;}
@@ -81,3 +84,54 @@ void solid_color::set_color(color col) {
 color solid_color::pattern_at_local(tuple point) const {
   return c;
 }
+
+pattern_aggregate::pattern_aggregate(): patterns{} {}
+pattern_aggregate::pattern_aggregate(const pattern_aggregate& other): pattern{other}, patterns{} {
+  for(int i = 0; i < other.num_pats(); i++) {
+    add_pat(*other.patterns.at(i));
+  }
+}
+pattern_aggregate::pattern_aggregate(pattern_aggregate&& other): pattern{other}, patterns{} {
+  std::swap(patterns, other.patterns);
+}
+pattern_aggregate& pattern_aggregate::operator=(const pattern_aggregate& other) {
+  // copy swap idiom can't be used here since pattern_aggregate is abstract
+  // this is a cool technicality in C++!
+  pattern::operator=(other);
+
+  patterns.clear();
+  for(int i = 0; i < other.num_pats(); i++) {
+    add_pat(*other.patterns.at(i));
+  }
+
+  return *this;
+}
+pattern_aggregate& pattern_aggregate::operator=(pattern_aggregate&& other) {
+  pattern::operator=(std::move(other));
+
+  std::swap(patterns, other.patterns);
+  return *this;
+}
+
+void pattern_aggregate::add_pat(pattern& p) {
+  patterns.emplace_back(p.clone());
+}
+
+void pattern_aggregate::add_pat(pattern&& p) {
+  add_pat(p);
+}
+
+pattern& pattern_aggregate::get_pat(int i) {
+  return *patterns.at(i);
+}
+pattern* pattern_aggregate::ptr_get_pat(int i) {
+  return patterns.at(i).get();
+}
+int pattern_aggregate::num_pats() const {
+  return patterns.size();
+}
+
+void pattern::set_global(bool g) {
+  use_global = g;
+}
+

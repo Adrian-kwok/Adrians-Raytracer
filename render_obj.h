@@ -29,6 +29,8 @@ class render_obj : public obj {
   // at some point there will be a need for polymorphic materials, be paitient
   material mat;
 
+  render_obj();
+
   // probably (maybe?) should add virtual big 5 when needed
   virtual ~render_obj() = default;
 

@@ -70,6 +70,8 @@ computation::computation(const intersection& i, const ray& r)
   }
 }
 
+render_obj::render_obj(): obj{} {}
+
 tuple render_obj::normal_at(tuple p) const {
   if (p.w != 1) std::cerr << "not a point, error" << std::endl;
   p = apply_transform(p);

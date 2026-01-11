@@ -13,7 +13,7 @@ class World {
     std::vector<std::unique_ptr<light>> lights;
 
     public:
-        color bg; // this is probably temporary
+        color bg = WHITE; // this is probably temporary
 
         World();
         World(const World& other);

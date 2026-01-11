@@ -6,6 +6,8 @@ double determinant(double a, double b, double c) {
   return pow(b, 2) - 4 * a * c;
 }
 
+sphere::sphere(): render_obj{} {}
+
 std::unique_ptr<render_obj> sphere::clone() const {
   return std::unique_ptr<sphere>(new sphere{*this});
 }
@@ -35,6 +37,8 @@ tuple sphere::normal_at_local(tuple p) const {
 }
 
 material sphere::mat_at(tuple p) const { return mat; }
+
+plane::plane(): render_obj{} {}
 
 std::unique_ptr<render_obj> plane::clone() const {
   return std::unique_ptr<plane>(new plane{*this});

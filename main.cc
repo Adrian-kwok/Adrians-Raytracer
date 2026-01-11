@@ -417,50 +417,99 @@ int main() {
   p_point(r3.origin);
   p_point(r3.direction);
 
+  color o = color{0.1,0.1,0.1};
+  color k = WHITE;
+  striped good_luck{std::vector<color>{}};
+  good_luck.add_obj_transform(roto_y(PI/2)); 
+  striped s12{{k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k}};
+  s12.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s12); 
+  striped s11{{k,o,k,o,k,o,o,k,k,o,o,k,k,o,o,o,k}};
+  s11.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s11);
+  striped s8{{k,k,o,o,k,k,k,o,k,o,k,o,k,k,k,o,k}};
+  s8.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s8);
+  striped s7{{k,o,k,o,k,o,o,k,k,o,k,o,k,k,k,o,k}};
+  s7.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s7);
+  striped s9{{k,k,k,o,k,k,k,k,k,k,k,k,k,k,k,o,k}};
+  s9.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s9);
+  striped s6{{k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k}};
+  s6.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s6); 
+  striped s5{{k,o,o,k,k,k,o,k,k,k,o,k,k,o,o,k,k}};
+  s5.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s5);
+  striped s4{{k,o,k,o,k,o,k,o,k,o,k,o,k,o,k,o,k}};
+  s4.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s4);
+  striped s3{{k,o,o,k,k,k,o,k,k,k,o,k,k,k,k,o,k}};
+  s3.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s3);
+  striped s2{{k,o,k,k,k,k,k,k,k,k,k,k,k,o,o,k,k}};
+  s2.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s2);
+  striped s1{{k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k}};
+  s1.add_obj_transform(roto_y(PI/2));
+  good_luck.add_pat(s1);
+  
+  std::cout << good_luck.num_pats() << std::endl;
+
+  good_luck.set_loop(false);
+
+  good_luck.add_obj_transform(roto_x(PI));
+  good_luck.add_obj_transform(scale(0.2,0.2,0.2));
+  good_luck.add_world_transform(translate(-2,0,1.1));
+
   World w;
   point_light p {color {0.6,0.6,0.6}};
-  p.add_world_transform(translate(-10,10,-20));
+  p.add_world_transform(translate(-10,100,-20));
   w.add_light(p);
 
-  point_light q {color {0.6, 0.6,0.6}};
+  point_light q {color {0.8, 0.8,0.8}};
   q.add_world_transform(translate(5, 1, 2));
   w.add_light(q);
 
-  gradient s {{color{1,1,0},color{1,1,0},color{0,0,0}, color{0,0,0}}, true, true};
-  s.add_world_transform(translate(0.5,0.5,0));
-  s.add_obj_transform(scale(0.1,0.1,0.1));
-
   plane floor;
-  floor.mat = material{color{1, 0.9, 0.9}};
+  floor.mat = material{color{1, 1, 1}};
   floor.mat.set_specular(0);
   
   plane left_wall = floor;
   left_wall.add_world_transform(translate(0,0,5) * roto_y(-PI/4) * roto_x(-PI / 2));
+  left_wall.mat.set_color_pattern(good_luck);
   w.add_obj(left_wall);
 
-
-  sphere middle;
-  middle.add_world_transform(scale(1,1,1));
-  middle.add_world_transform(translate(0, 1, 0.5));
-  middle.mat.set_color_pattern(s);
-  middle.mat.set_diffuse(0.7);
-  middle.mat.set_specular(0.4);
-  w.add_obj(middle);
-
   plane right_wall = floor;
+  floor.mat.set_color_pattern(striped(std::vector<color>{{0.7,0.7,1},{1,1,1}}, true));
   right_wall.add_world_transform(translate(0,0,5) * roto_x(-PI / 2));
   w.add_obj(right_wall);
-  
   w.add_obj(floor);
 
   sphere right;
   right.set_world_transform(translate(1.5,0.5,-0.5));
   right.set_obj_transform(scale(0.5,0.5,0.5));
-  right.mat.set_color_pattern(solid_color{color{0.4,0.4,0.4}});
-  right.mat.set_diffuse(0.5);
+  checker ch {{color{1,0,0}, color{1,1,0}}};
+  ch.add_obj_transform(scale(0.4,0.4,0.4));
+  right.mat.set_color_pattern(ch);
+  right.mat.set_diffuse(0.7);
   right.mat.set_specular(1);
   right.mat.set_shininess(900);
   w.add_obj(right);
+
+  sphere middle;
+  middle.add_world_transform(scale(1,1,1));
+  middle.add_obj_transform(roto_y(PI/6));
+  middle.add_obj_transform(roto_z(PI/3));
+  middle.add_world_transform(translate(0, 1, 0.5));
+  gradient s {{color{0,0,0},BLACK,color{1,1,0},color{1,1,0}}, true, false};
+  s.add_world_transform(translate(0.5,0.5,0));
+  s.add_obj_transform(scale(0.1,0.1,0.1));
+  middle.mat.set_color_pattern(s);
+  middle.mat.set_diffuse(0.7);
+  middle.mat.set_specular(0.4);
+  w.add_obj(middle);
 
   sphere left;
   left.set_world_transform(translate(-1.5, 0.33, -0.75));
@@ -470,7 +519,7 @@ int main() {
   left.mat.set_specular(1);
   w.add_obj(left);
 
-  Camera cam{300, 200, PI/3};
+  Camera cam{1920, 1080, PI/3 + 0.1};
   cam.set_transform(view_transform(point(0,1.5, -5), point(0, 1,0), vector(0,1,0)));
 
   canvas_to_ppm(cam.render(w), "img/aaa.ppm");
@@ -497,5 +546,7 @@ int main() {
   std::cout << w1.inShadow(0,point(-2, 2, -2)) << std::endl;
 
   */
+
   }
+
 

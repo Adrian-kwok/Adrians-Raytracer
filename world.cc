@@ -104,7 +104,14 @@ color World::shade_hit(const computation& c) const{
 color World::color_at(const ray& r) const {
   std::vector<intersection> hits = intersect(r);
   
-  if (hits.size() == 0) { // use the background color
+  if (hits.size() == 0 ) { // use the background color
+    return background_col();
+  } 
+
+  // if there are no hits
+  intersection thehit = hit(hits);
+
+  if (thehit.o == NOINT.o) {
     return background_col();
   } else {  // use the rendered color
     computation c {hit(hits), r};
